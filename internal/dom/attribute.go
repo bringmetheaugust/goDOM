@@ -1,4 +1,4 @@
-package vdom
+package dom
 
 type Attribute struct {
 	Name  string

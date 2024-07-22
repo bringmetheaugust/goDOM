@@ -1,13 +1,13 @@
 package parser
 
 import (
-	"goDOM/internal/vdom"
+	"goDOM/internal/dom"
 	"strings"
 )
 
 // Convert attribute from markup string to struct
-func parseAttribute(attr string) vdom.Attribute {
+func parseAttribute(attr string) dom.Attribute {
 	res := strings.Split(attr, "=")
 
-	return vdom.Attribute{res[0], res[1]}
+	return dom.Attribute{Name: res[0], Value: res[1]}
 }

@@ -7,20 +7,24 @@ import (
 	"os"
 )
 
-func create(data []byte) dom.Document {
+func Create(data []byte) dom.Document {
 	root := parser.ParseMarkup(string(data))
 
-	return dom.CreateDocument(root)
+	return dom.Document{}.New(root)
 }
 
 func main() {
+	dev()
+}
+
+func dev() {
 	data, err := os.ReadFile("./mocks/test.html")
 
 	if err != nil {
 		panic(err)
 	}
 
-	document := create(data)
+	document := Create(data)
 
 	res, _ := document.GetElementById("\"ouu\"")
 	ress, _ := document.GetElementsByClassName("\"lol\"")

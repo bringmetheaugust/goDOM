@@ -1,12 +1,12 @@
 package parser
 
 import (
-	"goDOM/internal/vdom"
+	"goDOM/internal/dom"
 )
 
-// Parse HTML element from markup. Get custom V-DOM element.
-func parseElement(markup string) vdom.Element {
-	var newEl vdom.Element
+// Parse HTML element from markup. Get DOM element.
+func parseElement(markup string) dom.Element {
+	var newEl dom.Element
 
 	for markupPos, markupChar := range markup {
 		if markupChar == rune('>') {
@@ -22,7 +22,7 @@ func parseElement(markup string) vdom.Element {
 				if contentChar == rune('<') {
 					contentEndPos = contentPos
 					n := parseElement(content[contentPos:])
-					newEl.Childrens = append(newEl.Childrens, n)
+					newEl.Children = append(newEl.Children, n)
 
 					break
 				}

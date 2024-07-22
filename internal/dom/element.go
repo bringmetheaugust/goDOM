@@ -1,8 +1,8 @@
-package vdom
+package dom
 
 type Element struct {
 	TagName    string
 	InnerHTML  string
 	Attributes []Attribute
-	Childrens  []Element
+	Children   []Element
 }

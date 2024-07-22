@@ -1,10 +1,10 @@
 package parser
 
-import "goDOM/internal/vdom"
+import "goDOM/internal/dom"
 
 // Parsing HTML markup.
-// Return browser DOM-like struct.
-func ParseMarkup(markup string) vdom.Element {
+// Return DOM-like struct.
+func ParseMarkup(markup string) dom.Element {
 	element := parseElement(markup)
 
 	return element
