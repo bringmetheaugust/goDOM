@@ -1,22 +1,19 @@
-package htmlparser
+package parser
 
-type element struct {
-	tagName    string
-	innerHTML  string
-	attributes []attribute
-	childrens  []element
-}
+import (
+	"goDOM/internal/vdom"
+)
 
 // Parse HTML element from markup. Get custom V-DOM element.
-func parseElement(markup string) element {
-	var newEl element
+func parseElement(markup string) vdom.Element {
+	var newEl vdom.Element
 
 	for markupPos, markupChar := range markup {
 		if markupChar == rune('>') {
 			tag := parseTag(markup[:markupPos+1])
 
-			newEl.tagName = tag.name
-			newEl.attributes = tag.attributes
+			newEl.TagName = tag.name
+			newEl.Attributes = tag.attributes
 
 			content := markup[markupPos+1 : len(markup)-len(tag.name)-3]
 			contentEndPos := len(content)
@@ -25,13 +22,13 @@ func parseElement(markup string) element {
 				if contentChar == rune('<') {
 					contentEndPos = contentPos
 					n := parseElement(content[contentPos:])
-					newEl.childrens = append(newEl.childrens, n)
+					newEl.Childrens = append(newEl.Childrens, n)
 
 					break
 				}
 			}
 
-			newEl.innerHTML = content[:contentEndPos]
+			newEl.InnerHTML = content[:contentEndPos]
 
 			break
 		}

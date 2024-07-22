@@ -1,15 +1,18 @@
-package htmlparser
+package parser
 
-import "strings"
+import (
+	"goDOM/internal/vdom"
+	"strings"
+)
 
 type tag struct {
 	name       string
-	attributes []attribute
+	attributes []vdom.Attribute
 }
 
 // Parse HTML tag. Get tag name and rest attributes.
 func parseTag(markup string) tag {
-	var attributes []attribute
+	var attributes []vdom.Attribute
 
 	tagStr := markup[1 : len(markup)-1]
 	tagSplited := strings.Fields(tagStr)
