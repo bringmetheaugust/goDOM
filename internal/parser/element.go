@@ -6,8 +6,13 @@ import (
 )
 
 // Parse HTML element from markup. Get DOM element.
-func parseElement(markup string) dom.Element {
+func parseElement(markup string, parentEl dom.Element) dom.Element {
 	var newEl dom.Element
+
+	// if parent is exist
+	if parentEl.TagName != "" {
+		newEl.ParentElement = &parentEl
+	}
 
 	for markupPos, markupChar := range markup {
 		if markupChar == rune('>') {
@@ -35,10 +40,10 @@ func parseElement(markup string) dom.Element {
 			for contentPos, contentChar := range content {
 				if contentChar == rune('<') {
 					contentEndPos = contentPos
-					childrens := parseElement(content[contentPos:])
+					childrens := parseElement(content[contentPos:], newEl)
 					newEl.Children = append(newEl.Children, childrens)
 
-					if len(newEl.Children) >= 1 {
+					if len(newEl.Children) > 0 {
 						newEl.FirstChild = &newEl.Children[0]
 						newEl.LastChild = &newEl.Children[len(newEl.Children)-1]
 					}
