@@ -1,6 +1,6 @@
 package dom
 
-import "errors"
+import "goDOM/internal/errors"
 
 type Document struct {
 	root Element
@@ -16,7 +16,7 @@ func (d Document) GetElementById(id string) (Element, error) {
 	res, err := d.findByAttribute("id", id, d.root)
 
 	if err != nil {
-		return Element{}, errors.New("404")
+		return Element{}, errors.NotFoundErr{}
 	} else {
 		return res[0], nil
 	}
@@ -46,7 +46,7 @@ func (d Document) findByAttribute(attr string, v string, el Element) ([]Element,
 	}
 
 	if len(matches) == 0 {
-		return nil, errors.New("404")
+		return nil, errors.NotFoundErr{}
 	} else {
 		return matches, nil
 	}

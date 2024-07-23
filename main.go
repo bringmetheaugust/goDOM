@@ -26,8 +26,8 @@ func dev() {
 
 	document := Create(data)
 
-	res, _ := document.GetElementById("\"ouu\"")
-	ress, _ := document.GetElementsByClassName("\"lol\"")
+	res, err1 := document.GetElementById("\"ouu\"")
+	ress, err2 := document.GetElementsByClassName("\"lol\"")
 
-	fmt.Println(res, ress)
+	fmt.Println(res, ress, err1, err2)
 }
