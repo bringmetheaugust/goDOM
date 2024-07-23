@@ -2,8 +2,10 @@ package errors
 
 import "fmt"
 
-type NotFoundErr struct{}
+type NotFound struct {
+	Query string
+}
 
-func (e NotFoundErr) Error() string {
-	return fmt.Sprintf("not found")
+func (e *NotFound) Error() string {
+	return fmt.Sprintf("%v not found", e.Query)
 }

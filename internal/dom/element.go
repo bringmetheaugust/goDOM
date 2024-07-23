@@ -1,5 +1,7 @@
 package dom
 
+import "goDOM/internal/errors"
+
 type Element struct {
 	TagName       string
 	TextContent   string // only own text/content
@@ -11,4 +13,22 @@ type Element struct {
 	LastChild     *Element
 	Id            string
 	ParentElement *Element
+}
+
+// Get html attribute.
+func (e Element) GetAttribute(attr string) (string, error) {
+	for _, elAttr := range e.Attributes {
+		if elAttr.Name == attr {
+			return elAttr.Value, nil
+		}
+	}
+
+	return "", &errors.NotFound{}
+}
+
+// Element has HTML attribute.
+func (e Element) HasAttribute(attr string) bool {
+	_, err := e.GetAttribute(attr)
+
+	return err == nil
 }
