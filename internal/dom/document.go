@@ -3,6 +3,7 @@ package dom
 import (
 	"goDOM/internal/errors"
 	"goDOM/tools"
+	"slices"
 )
 
 type Document struct {
@@ -19,9 +20,12 @@ func (d Document) GetElementById(id string) (Element, error) {
 	return res[0], nil
 }
 
-// TODO doesn't work
 func (d Document) GetElementsByClassName(class string) ([]Element, error) {
-	return d.findByAttribute("class", class, d.root)
+	conditionFn := func(el Element) bool {
+		return slices.Contains(el.ClassList, class)
+	}
+
+	return d.findByCondition(conditionFn, d.root)
 }
 
 func (d Document) GetElementsByTagName(tag string) ([]Element, error) {
@@ -44,19 +48,19 @@ func (d Document) findByField(field string, val string, el Element) ([]Element, 
 }
 
 // Get element by attribute.
-func (d Document) findByAttribute(attr string, val string, el Element) ([]Element, error) {
-	conditionFn := func(el Element) bool {
-		for _, attrSearch := range el.Attributes {
-			if attrSearch.Name == attr && attrSearch.Value == val {
-				return true
-			}
-		}
+// func (d Document) findByAttribute(attr string, val string, el Element) ([]Element, error) {
+// 	conditionFn := func(el Element) bool {
+// 		for _, attrSearch := range el.Attributes {
+// 			if attrSearch.Name == attr && attrSearch.Value == val {
+// 				return true
+// 			}
+// 		}
 
-		return false
-	}
+// 		return false
+// 	}
 
-	return d.findByCondition(conditionFn, el)
-}
+// 	return d.findByCondition(conditionFn, el)
+// }
 
 // Get result by conditions, accamulate result.
 func (d Document) findByCondition(conditionFn func(Element) bool, el Element) ([]Element, error) {
