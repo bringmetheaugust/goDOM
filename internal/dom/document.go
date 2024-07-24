@@ -9,13 +9,6 @@ type Document struct {
 	root Element
 }
 
-// Create new document.
-func (d Document) New(rootEl Element) Document {
-	d.root = rootEl
-
-	return d
-}
-
 func (d Document) GetElementById(id string) (Element, error) {
 	res, err := d.findByField("Id", id, d.root)
 
@@ -36,44 +29,47 @@ func (d Document) GetElementsByTagName(tag string) ([]Element, error) {
 }
 
 // Get element by field. Only for cases when field's value is string.
-func (d Document) findByField(field string, v string, el Element) ([]Element, error) {
-	var matches []Element
-
-	fieldName, err := tools.GetFieldValue(&el, field)
-
-	if err == nil && fieldName == v {
-		matches = append(matches, el)
-	}
-
-	for _, children := range el.Children {
-		res, err := d.findByField(field, v, children)
+func (d Document) findByField(field string, val string, el Element) ([]Element, error) {
+	conditionFn := func(el Element) bool {
+		fieldValue, err := tools.GetFieldValue(&el, field)
 
 		if err != nil {
-			continue
+			return false
 		}
 
-		matches = append(matches, res...)
+		return fieldValue == val
 	}
 
-	if len(matches) == 0 {
-		return nil, &errors.NotFound{}
-	}
-
-	return matches, nil
+	return d.findByCondition(conditionFn, el)
 }
 
 // Get element by attribute.
-func (d Document) findByAttribute(attr string, v string, el Element) ([]Element, error) {
-	var matches []Element
-
-	for _, attrSearch := range el.Attributes {
-		if attrSearch.Name == attr && attrSearch.Value == v {
-			matches = append(matches, el)
+func (d Document) findByAttribute(attr string, val string, el Element) ([]Element, error) {
+	conditionFn := func(el Element) bool {
+		for _, attrSearch := range el.Attributes {
+			if attrSearch.Name == attr && attrSearch.Value == val {
+				return true
+			}
 		}
+
+		return false
 	}
 
-	for _, children := range el.Children {
-		res, err := d.findByAttribute(attr, v, children)
+	return d.findByCondition(conditionFn, el)
+}
+
+// Get result by conditions, accamulate result.
+func (d Document) findByCondition(conditionFn func(Element) bool, el Element) ([]Element, error) {
+	var matches []Element
+
+	// If element satisfies the condition
+	if conditionFn(el) {
+		matches = append(matches, el)
+	}
+
+	// do the same for childrens (recursion)
+	for _, child := range el.Children {
+		res, err := d.findByCondition(conditionFn, child)
 
 		if err != nil {
 			continue
@@ -88,56 +84,3 @@ func (d Document) findByAttribute(attr string, v string, el Element) ([]Element,
 
 	return matches, nil
 }
-
-// TODO Optimization
-
-// Обобщённая функция для поиска элементов
-// func (d Document) findByCondition(condition func(Element) bool, el Element) ([]Element, error) {
-// 	var matches []Element
-
-// 	// Проверяем условие для текущего элемента
-// 	if condition(el) {
-// 		matches = append(matches, el)
-// 	}
-
-// 	// Рекурсивно проверяем детей
-// 	for _, child := range el.Children {
-// 		res, err := d.findByCondition(condition, child)
-// 		if err != nil {
-// 			continue
-// 		}
-// 		matches = append(matches, res...)
-// 	}
-
-// 	// Если нет совпадений, возвращаем ошибку
-// 	if len(matches) == 0 {
-// 		return nil, NotFoundErr
-// 	}
-
-// 	return matches, nil
-// }
-
-// // Функция для поиска по полю
-// func (d Document) findByField(field string, value string, el Element) ([]Element, error) {
-// 	condition := func(el Element) bool {
-// 		fieldValue, err := getFieldValue(&el, field)
-// 		if err != nil {
-// 			return false
-// 		}
-// 		return fieldValue == value
-// 	}
-// 	return d.findByCondition(condition, el)
-// }
-
-// // Функция для поиска по атрибуту
-// func (d Document) findByAttribute(attr string, value string, el Element) ([]Element, error) {
-// 	condition := func(el Element) bool {
-// 		for _, attrSearch := range el.Attributes {
-// 			if attrSearch.Name == attr && attrSearch.Value == value {
-// 				return true
-// 			}
-// 		}
-// 		return false
-// 	}
-// 	return d.findByCondition(condition, el)
-// }

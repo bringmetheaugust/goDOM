@@ -10,7 +10,7 @@ import (
 func Create(data []byte) dom.Document {
 	root := parser.ParseMarkup(string(data))
 
-	return dom.Document{}.New(root)
+	return dom.CreateDocument(root)
 }
 
 func main() {

@@ -15,7 +15,7 @@ type Element struct {
 	ParentElement *Element
 }
 
-// Get html attribute.
+// Get HTML attribute.
 func (e Element) GetAttribute(attr string) (string, error) {
 	for _, elAttr := range e.Attributes {
 		if elAttr.Name == attr {
