@@ -1,9 +1,8 @@
 package errors
 
-import "fmt"
-
-type NotFound err
+type NotFound struct {
+}
 
 func (e NotFound) Error() string {
-	return fmt.Sprintf("%v not found", e.query)
+	return "Not found"
 }

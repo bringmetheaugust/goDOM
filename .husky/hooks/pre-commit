@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if command -v golangci-lint > /dev/null 2>&1; then
+    golangci-lint run
+else
+    echo "golangci-lint is not installed or binary file locates in the wrong directory."
+fi
+
+go fmt .
+go test ./...
+golangci-lint run

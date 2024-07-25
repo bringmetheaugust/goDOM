@@ -16,7 +16,7 @@ type query struct {
 // Parse and get query as struct.
 func parseQuery(qStr string) (*query, error) {
 	if qStr == "" {
-		return &query{}, errors.InvalidQuery{}
+		return &query{}, errors.InvalidQuery{QueryStr: qStr}
 	}
 
 	queries := strings.Fields(qStr)

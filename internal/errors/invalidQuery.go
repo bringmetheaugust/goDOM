@@ -1,7 +1,11 @@
 package errors
 
-type InvalidQuery err
+import "fmt"
+
+type InvalidQuery struct {
+	QueryStr string
+}
 
 func (e InvalidQuery) Error() string {
-	panic("unimplemented")
+	return fmt.Sprintf("invalid query: %v", e.QueryStr)
 }

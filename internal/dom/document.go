@@ -10,31 +10,21 @@ type Document struct {
 	root Element
 }
 
-// TODO: refactoring && deep query search
 func (d Document) QuerySelector(queryStr string) (Element, error) {
-	q, err := parseQuery(queryStr)
+	conditionFn, err := d.elementMatchesQuery(queryStr)
 
 	if err != nil {
 		return Element{}, err
 	}
 
-	conditionFn := func(el Element) bool {
-		return d.elementMatchesQuery(*q, el)
-	}
-
 	return d.findOneByCondition(conditionFn, d.root)
 }
 
-// TODO: refactoring && deep query search
 func (d Document) QuerySelectorAll(queryStr string) ([]Element, error) {
-	q, err := parseQuery(queryStr)
+	conditionFn, err := d.elementMatchesQuery(queryStr)
 
 	if err != nil {
 		return nil, err
-	}
-
-	conditionFn := func(el Element) bool {
-		return d.elementMatchesQuery(*q, el)
 	}
 
 	return d.findAllByCondition(conditionFn, d.root)
@@ -44,7 +34,7 @@ func (d Document) GetElementById(id string) (Element, error) {
 	res, err := d.findByField("Id", id, d.root)
 
 	if err != nil {
-		return Element{}, &errors.NotFound{}
+		return Element{}, err
 	}
 
 	return res[0], nil
@@ -64,24 +54,31 @@ func (d Document) GetElementsByTagName(tag string) ([]Element, error) {
 
 // * Helpers
 
-// Check if element matches query
-func (d Document) elementMatchesQuery(q query, el Element) bool {
-	if q.tagName != "" && el.TagName != q.tagName {
-		return false
-	}
+// TODO: deep query search
+// Check if element matches query.
+func (d Document) elementMatchesQuery(queryStr string) (func(Element) bool, error) {
+	q, err := parseQuery(queryStr)
 
-	if q.id != "" && el.Id != q.id {
-		return false
-	}
-
-	// check if all classes from query contains element
-	for _, class := range q.classList {
-		if !slices.Contains(el.ClassList, class) {
+	conditionFn := func(el Element) bool {
+		if q.tagName != "" && el.TagName != q.tagName {
 			return false
 		}
+
+		if q.id != "" && el.Id != q.id {
+			return false
+		}
+
+		// check if all classes from query contains element
+		for _, class := range q.classList {
+			if !slices.Contains(el.ClassList, class) {
+				return false
+			}
+		}
+
+		return true
 	}
 
-	return true
+	return conditionFn, err
 }
 
 // Get elements by field. Only for cases when field's value is string.
