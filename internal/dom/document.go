@@ -10,6 +10,36 @@ type Document struct {
 	root Element
 }
 
+// TODO: refactoring && deep query search
+func (d Document) QuerySelector(queryStr string) (Element, error) {
+	q, err := parseQuery(queryStr)
+
+	if err != nil {
+		return Element{}, err
+	}
+
+	conditionFn := func(el Element) bool {
+		return d.elementMatchesQuery(*q, el)
+	}
+
+	return d.findOneByCondition(conditionFn, d.root)
+}
+
+// TODO: refactoring && deep query search
+func (d Document) QuerySelectorAll(queryStr string) ([]Element, error) {
+	q, err := parseQuery(queryStr)
+
+	if err != nil {
+		return nil, err
+	}
+
+	conditionFn := func(el Element) bool {
+		return d.elementMatchesQuery(*q, el)
+	}
+
+	return d.findAllByCondition(conditionFn, d.root)
+}
+
 func (d Document) GetElementById(id string) (Element, error) {
 	res, err := d.findByField("Id", id, d.root)
 
@@ -25,14 +55,36 @@ func (d Document) GetElementsByClassName(class string) ([]Element, error) {
 		return slices.Contains(el.ClassList, class)
 	}
 
-	return d.findByCondition(conditionFn, d.root)
+	return d.findAllByCondition(conditionFn, d.root)
 }
 
 func (d Document) GetElementsByTagName(tag string) ([]Element, error) {
 	return d.findByField("TagName", tag, d.root)
 }
 
-// Get element by field. Only for cases when field's value is string.
+// * Helpers
+
+// Check if element matches query
+func (d Document) elementMatchesQuery(q query, el Element) bool {
+	if q.tagName != "" && el.TagName != q.tagName {
+		return false
+	}
+
+	if q.id != "" && el.Id != q.id {
+		return false
+	}
+
+	// check if all classes from query contains element
+	for _, class := range q.classList {
+		if !slices.Contains(el.ClassList, class) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Get elements by field. Only for cases when field's value is string.
 func (d Document) findByField(field string, val string, el Element) ([]Element, error) {
 	conditionFn := func(el Element) bool {
 		fieldValue, err := tools.GetFieldValue(&el, field)
@@ -44,10 +96,10 @@ func (d Document) findByField(field string, val string, el Element) ([]Element, 
 		return fieldValue == val
 	}
 
-	return d.findByCondition(conditionFn, el)
+	return d.findAllByCondition(conditionFn, el)
 }
 
-// Get element by attribute.
+// Get elements by attribute.
 // func (d Document) findByAttribute(attr string, val string, el Element) ([]Element, error) {
 // 	conditionFn := func(el Element) bool {
 // 		for _, attrSearch := range el.Attributes {
@@ -59,11 +111,11 @@ func (d Document) findByField(field string, val string, el Element) ([]Element, 
 // 		return false
 // 	}
 
-// 	return d.findByCondition(conditionFn, el)
+// 	return d.findAllByCondition(conditionFn, el)
 // }
 
-// Get result by conditions, accamulate result.
-func (d Document) findByCondition(conditionFn func(Element) bool, el Element) ([]Element, error) {
+// Get results by conditions.
+func (d Document) findAllByCondition(conditionFn func(Element) bool, el Element) ([]Element, error) {
 	var matches []Element
 
 	// If element satisfies the condition
@@ -73,7 +125,7 @@ func (d Document) findByCondition(conditionFn func(Element) bool, el Element) ([
 
 	// do the same for childrens (recursion)
 	for _, child := range el.Children {
-		res, err := d.findByCondition(conditionFn, child)
+		res, err := d.findAllByCondition(conditionFn, child)
 
 		if err != nil {
 			continue
@@ -83,8 +135,29 @@ func (d Document) findByCondition(conditionFn func(Element) bool, el Element) ([
 	}
 
 	if len(matches) == 0 {
-		return nil, &errors.NotFound{}
+		return nil, errors.NotFound{}
 	}
 
 	return matches, nil
+}
+
+// Get first result by conditions.
+func (d Document) findOneByCondition(conditionFn func(Element) bool, el Element) (Element, error) {
+	// If element satisfies the condition
+	if conditionFn(el) {
+		return el, nil
+	}
+
+	// check childrens (recursion)
+	for _, child := range el.Children {
+		res, err := d.findOneByCondition(conditionFn, child)
+
+		if err != nil {
+			continue
+		}
+
+		return res, nil
+	}
+
+	return Element{}, errors.NotFound{}
 }

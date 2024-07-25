@@ -23,7 +23,7 @@ func (e Element) GetAttribute(attr string) (string, error) {
 		}
 	}
 
-	return "", &errors.NotFound{}
+	return "", errors.NotFound{}
 }
 
 // Element has HTML attribute.
