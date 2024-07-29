@@ -12,25 +12,25 @@ type tagTestPair struct {
 	expect tag
 }
 
-var tagTests = []tagTestPair{
+var tagTests = [...]tagTestPair{
 	{
-		"<div class='lol lil lop' hidden data-set='1 2 3' data_mid='wi-fi'>",
-		tag{name: "div", attributes: []dom.Attribute{
-			{Name: "class", Value: "lol lil lop"},
-			{Name: "hidden", Value: ""},
-			{Name: "data-set", Value: "1 2 3"},
-			{Name: "data_mid", Value: "wi-fi"},
+		"div class='lol lil lop' hidden data-set='1 2 3' data_mid='wi-fi'",
+		tag{name: "div", attributes: dom.Attributes{
+			"class":    "lol lil lop",
+			"hidden":   "",
+			"data-set": "1 2 3",
+			"data_mid": "wi-fi",
 		}},
 	},
 	{
-		"<div class='lol'>",
-		tag{name: "div", attributes: []dom.Attribute{
-			{Name: "class", Value: "lol"},
+		"div class='lol'",
+		tag{name: "div", attributes: dom.Attributes{
+			"class": "lol",
 		}},
 	},
 	{
-		"<div>",
-		tag{"div", nil},
+		"div",
+		tag{"div", dom.Attributes{}},
 	},
 }
 

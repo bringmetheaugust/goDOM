@@ -1,12 +1,16 @@
 package parser
 
 import (
-	"goDOM/internal/dom"
 	"strings"
 )
 
+type attribute struct {
+	name  string
+	value string
+}
+
 // Convert attribute from markup string to struct.
-func parseAttribute(attr string) dom.Attribute {
+func parseAttribute(attr string) attribute {
 	res := strings.Split(attr, "=")
 	var attrVal string
 
@@ -14,8 +18,8 @@ func parseAttribute(attr string) dom.Attribute {
 		attrVal = strings.ReplaceAll(res[1], "'", "")
 	}
 
-	return dom.Attribute{
-		Name:  res[0],
-		Value: attrVal,
+	return attribute{
+		name:  res[0],
+		value: attrVal,
 	}
 }

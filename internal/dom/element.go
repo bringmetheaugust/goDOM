@@ -2,10 +2,11 @@ package dom
 
 import "goDOM/internal/errors"
 
+type Attributes map[string]string
 type Element struct {
 	TagName       string
 	TextContent   string // only own text/content
-	Attributes    []Attribute
+	Attributes    Attributes
 	Children      []Element
 	ClassName     string
 	ClassList     []string
@@ -17,10 +18,10 @@ type Element struct {
 
 // Get HTML attribute.
 func (e Element) GetAttribute(attr string) (string, error) {
-	for _, elAttr := range e.Attributes {
-		if elAttr.Name == attr {
-			return elAttr.Value, nil
-		}
+	val, ok := e.Attributes[attr]
+
+	if ok {
+		return val, nil
 	}
 
 	return "", errors.NotFound{}

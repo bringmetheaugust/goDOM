@@ -7,20 +7,19 @@ import (
 
 type tag struct {
 	name       string
-	attributes []dom.Attribute
+	attributes dom.Attributes
 }
 
-// Parse HTML tag. Get tag name and rest attributes.
+// Parse tokenized tag (without </>). Get tag name and rest attributes.
 func parseTag(markup string) tag {
-	var attributes []dom.Attribute
+	attributes := make(dom.Attributes)
 
-	tagStr := markup[1 : len(markup)-1]
 	re := regexp.MustCompile(`([^\s=]+='[^']*'|[^\s=]+)`)
-	tagSplited := re.FindAllString(tagStr, -1)
+	tagSplited := re.FindAllString(markup, -1)
 
 	for _, attr := range tagSplited[1:] {
 		attr := parseAttribute(attr)
-		attributes = append(attributes, attr)
+		attributes[attr.name] = attr.value
 	}
 
 	return tag{tagSplited[0], attributes}

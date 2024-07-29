@@ -3,12 +3,10 @@ package main
 import (
 	"goDOM/internal/dom"
 	"goDOM/internal/parser"
-	"strings"
 )
 
 func Create(data []byte) dom.Document {
-	unescapedStr := strings.ReplaceAll(string(data), `"`, `'`) // cause string() shielding /"
-	root := parser.ParseMarkup(string(unescapedStr))
+	root, _ := parser.ParseHTML(string(data))
 
 	return dom.CreateDocument(root)
 }

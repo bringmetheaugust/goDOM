@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"goDOM/internal/dom"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -9,17 +8,17 @@ import (
 
 type attrTestPair struct {
 	value  string
-	expect dom.Attribute
+	expect attribute
 }
 
-var attributeTests = []attrTestPair{
-	{"class='lol'", dom.Attribute{Name: "class", Value: "lol"}},
-	{"href='htttp://lol.com'", dom.Attribute{Name: "href", Value: "htttp://lol.com"}},
-	{"data-name='tag id'", dom.Attribute{Name: "data-name", Value: "tag id"}},
-	{"data_shit='bitch'", dom.Attribute{Name: "data_shit", Value: "bitch"}},
-	{"hidden", dom.Attribute{Name: "hidden", Value: ""}},
-	{"hidden=''", dom.Attribute{Name: "hidden", Value: ""}},
-	{"hidden='? __ ? &__'", dom.Attribute{Name: "hidden", Value: "? __ ? &__"}},
+var attributeTests = [...]attrTestPair{
+	{"class='lol'", attribute{name: "class", value: "lol"}},
+	{"href='htttp://lol.com'", attribute{name: "href", value: "htttp://lol.com"}},
+	{"data-name='tag id'", attribute{name: "data-name", value: "tag id"}},
+	{"data_shit='bitch'", attribute{name: "data_shit", value: "bitch"}},
+	{"hidden", attribute{name: "hidden", value: ""}},
+	{"hidden=''", attribute{name: "hidden", value: ""}},
+	{"hidden='? __ ? &__'", attribute{name: "hidden", value: "? __ ? &__"}},
 }
 
 func Test_parseAttribute(t *testing.T) {

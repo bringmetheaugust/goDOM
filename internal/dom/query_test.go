@@ -12,7 +12,7 @@ type queryTestPair struct {
 	expectErr bool
 }
 
-var queryTests = []queryTestPair{
+var queryTests = [...]queryTestPair{
 	{
 		"ul#lal li.lol span.lol_1.lol-2",
 		query{
