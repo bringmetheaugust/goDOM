@@ -5,8 +5,9 @@ import (
 	"goDOM/internal/parser"
 )
 
+// Parsing markup, create and return DOM with element tree and API.
 func Create(data []byte) (*dom.Document, error) {
-	root, err := parser.ParseHTML(string(data))
+	root, err := parser.Parse(string(data))
 
 	if err != nil {
 		return nil, err

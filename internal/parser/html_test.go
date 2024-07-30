@@ -82,7 +82,7 @@ func mapDom(DOM *dom.Element) interface{} {
 // TODO: temporary frozen
 func Tessssssssssssst_ParseHTML(t *testing.T) {
 	testFile, _ := os.ReadFile("../../test/parse_html.html")
-	DOM, _ := ParseHTML(string(testFile))
+	DOM, _ := Parse(string(testFile))
 
 	// ? Map Elemenet struct and remove ParentElement field.
 	mapedDOM := mapDom(DOM)

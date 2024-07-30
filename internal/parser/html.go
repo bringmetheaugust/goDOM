@@ -2,25 +2,18 @@ package parser
 
 import (
 	"goDOM/internal/dom"
-	"goDOM/internal/errors"
 	"strings"
 )
 
-// Parse HTML from markup. Get DOM tree.
-func ParseHTML(markup string) (*dom.Element, error) {
-	markup = normalize(markup)
-
-	if len(markup) == 0 {
-		return &dom.Element{}, errors.InvalidRequest{Place: "ParseHTML"}
-	}
-
+// Parse markup. Get DOM-like element tree.
+func parse(markup string) *dom.Element {
 	var parentStack []dom.Element
 	var root dom.Element
 	var currEl *dom.Element
 
 	for _, token := range tokenize(markup) {
 		switch {
-		case strings.HasPrefix(token, "<") && strings.HasSuffix(token, "/>"): // ? Self-closing tag (for XHTML)
+		case strings.HasPrefix(token, "<") && strings.HasSuffix(token, "/>"): // ? self-closing tag (for XHTML)
 			tag := parseTag(token[1 : len(token)-2])
 			newEl := dom.Element{TagName: tag.name, Attributes: tag.attributes}
 
@@ -29,7 +22,7 @@ func ParseHTML(markup string) (*dom.Element, error) {
 			} else {
 				root = newEl
 			}
-		case strings.HasPrefix(token, "</"): // Tag closes
+		case strings.HasPrefix(token, "</"): // tag closes
 			if currEl != nil {
 				parentStack = append(parentStack, *currEl)
 			}
@@ -59,7 +52,7 @@ func ParseHTML(markup string) (*dom.Element, error) {
 			}
 
 			currEl = nil
-		case strings.HasPrefix(token, "<"): // New tag
+		case strings.HasPrefix(token, "<"): // new tag
 			tag := parseTag(token[1 : len(token)-1])
 			newEl := dom.Element{TagName: tag.name, Attributes: tag.attributes}
 
@@ -84,6 +77,8 @@ func ParseHTML(markup string) (*dom.Element, error) {
 			}
 
 			currEl = &newEl
+		case strings.HasPrefix(token, "<!"): // skip doctype and comments
+			continue
 		default: // Element inner context
 			if currEl != nil {
 				currEl.TextContent += token
@@ -95,5 +90,5 @@ func ParseHTML(markup string) (*dom.Element, error) {
 		panic("unmatched opening tags")
 	}
 
-	return &root, nil
+	return &root
 }

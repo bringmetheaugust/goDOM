@@ -8,6 +8,7 @@ import (
 )
 
 var tokenizeExpect = []string{
+	"<!DOCTYPE html>",
 	"<html lang='ua'>",
 	"<head>",
 	"<title>",
@@ -17,12 +18,14 @@ var tokenizeExpect = []string{
 	"<link type='xml/text' href='/README.md' />",
 	"</head>",
 	"<body>",
+	"<!-- <div>wtf, man???</div> -->",
 	"<ul>",
 	"<li>",
 	"li 1",
 	"</li>",
 	"<li>",
 	"li 2",
+	"<!-- <ul><li></li><li>блять..</li></ul> -->",
 	"</li>",
 	"</ul>",
 	"</body>",
