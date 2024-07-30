@@ -1,67 +1,91 @@
 package parser
 
-// import (
-// 	"goDOM/internal/dom"
-// 	"testing"
+import (
+	"goDOM/internal/dom"
+	"goDOM/tools"
+	"os"
+	"testing"
 
-// 	"github.com/stretchr/testify/assert"
-// )
+	"github.com/stretchr/testify/assert"
+)
 
-// var htmlTest = ``
-// var htmlExpect = dom.Element{
-// 	TagName:     "html",
-// 	TextContent: "",
-// 	Attributes: dom.Attributes{
-// 		"lang": "ua",
-// 	},
-// Children: []dom.Element{
-// 	{
-// 		TagName:     "li",
-// 		TextContent: "ok?",
-// 		Attributes: dom.Attributes{
-// 			"class": "lol_1",
-// 		},
-// 		Children:      nil,
-// 		ClassName:     "lol_1",
-// 		ClassList:     []string{"lol_1"},
-// 		FirstChild:    nil,
-// 		LastChild:     nil,
-// 		Id:            "",
-// 		ParentElement: nil,
-// 	},
-// 	{
-// 		TagName:     "li",
-// 		TextContent: "ok???",
-// 		Attributes: dom.Attributes{
-// 			"class": "lol_2",
-// 		},
-// 		Children:      nil,
-// 		ClassName:     "lol_2",
-// 		ClassList:     []string{"lol_2"},
-// 		FirstChild:    nil,
-// 		LastChild:     nil,
-// 		Id:            "",
-// 		ParentElement: nil,
-// 	},
-// 	{
-// 		TagName:     "li",
-// 		TextContent: "ok",
-// 		Attributes: dom.Attributes{
-// 			"class": "lol_3",
-// 		},
-// 		Children:      nil,
-// 		ClassName:     "lol_3",
-// 		ClassList:     []string{"lol_3"},
-// 		FirstChild:    nil,
-// 		LastChild:     nil,
-// 		Id:            "",
-// 		ParentElement: nil,
-// 	},
-// },
-// }
+var htmlExpect = &dom.Element{
+	TagName:    "html",
+	Attributes: dom.Attributes{"lang": "en"},
+	Children: []dom.Element{
+		{
+			TagName: "body",
+			Children: []dom.Element{
+				{
+					TagName:    "ul",
+					Attributes: dom.Attributes{"class": "lol lul", "id": "ou"},
+					Id:         "ou",
+					ClassName:  "lol lul",
+					ClassList:  []string{"lol", "lul"},
+					Children: []dom.Element{
+						{
+							TagName:     "li",
+							Attributes:  dom.Attributes{"id": "ouu"},
+							Id:          "ouu",
+							TextContent: "li 0",
+							Children: []dom.Element{
+								{
+									TagName:    "ul",
+									Attributes: dom.Attributes{"class": "two"},
+									ClassName:  "two",
+									ClassList:  []string{"two"},
+									Children: []dom.Element{
+										{
+											TagName:     "li",
+											Attributes:  dom.Attributes{"href": "afa sada_1"},
+											TextContent: "li 1",
+											Children:    nil,
+										},
+										{
+											TagName:     "li",
+											Attributes:  dom.Attributes{"href": "afa sada_2"},
+											TextContent: "li 2",
+											Children:    nil,
+										},
+										{
+											TagName:     "li",
+											Attributes:  dom.Attributes{"href": "afa sada_3"},
+											TextContent: "li 3",
+											Children:    nil,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					TagName:     "span",
+					TextContent: "this is span, baby",
+					Children:    nil,
+				},
+			},
+		},
+	},
+}
 
-// func Test_ParseHTML(t *testing.T) {
-// 	v, _ := ParseHTML(htmlTest)
+func mapDom(DOM *dom.Element) interface{} {
+	newStruct := tools.CopyStructWithoutFields(DOM, []string{"ParentElement"}).(dom.Element)
 
-// 	assert.EqualValuesf(t, htmlExpect, v, "")
-// }
+	for _, child := range newStruct.Children {
+		child = mapDom(&child).(dom.Element)
+	}
+
+	return newStruct
+}
+
+// TODO: temporary frozen
+func Tessssssssssssst_ParseHTML(t *testing.T) {
+	testFile, _ := os.ReadFile("../../test/parse_html.html")
+	DOM, _ := ParseHTML(string(testFile))
+
+	// ? Map Elemenet struct and remove ParentElement field.
+	mapedDOM := mapDom(DOM)
+
+	assert.EqualValuesf(t, htmlExpect, mapedDOM, "")
+}

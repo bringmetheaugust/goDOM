@@ -10,17 +10,13 @@ type Element struct {
 	Children      []Element
 	ClassName     string
 	ClassList     []string
-	FirstChild    *Element
-	LastChild     *Element
 	Id            string
 	ParentElement *Element
 }
 
 // Get HTML attribute.
 func (e Element) GetAttribute(attr string) (string, error) {
-	val, ok := e.Attributes[attr]
-
-	if ok {
+	if val, ok := e.Attributes[attr]; ok {
 		return val, nil
 	}
 

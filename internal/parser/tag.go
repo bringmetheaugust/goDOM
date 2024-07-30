@@ -22,5 +22,9 @@ func parseTag(markup string) tag {
 		attributes[attr.name] = attr.value
 	}
 
+	if len(attributes) == 0 {
+		attributes = nil
+	}
+
 	return tag{tagSplited[0], attributes}
 }

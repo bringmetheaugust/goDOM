@@ -6,9 +6,9 @@ import (
 )
 
 func dev() {
-	data, _ := os.ReadFile("./test/test_1.html")
+	data, _ := os.ReadFile("./test/parse_html.html")
 
-	document := Create(data)
+	document, _ := Create(data)
 
 	fmt.Println(document)
 

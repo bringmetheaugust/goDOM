@@ -30,7 +30,7 @@ var tagTests = [...]tagTestPair{
 	},
 	{
 		"div",
-		tag{"div", dom.Attributes{}},
+		tag{"div", nil},
 	},
 }
 

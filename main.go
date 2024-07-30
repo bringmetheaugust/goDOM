@@ -5,10 +5,14 @@ import (
 	"goDOM/internal/parser"
 )
 
-func Create(data []byte) dom.Document {
-	root, _ := parser.ParseHTML(string(data))
+func Create(data []byte) (*dom.Document, error) {
+	root, err := parser.ParseHTML(string(data))
 
-	return dom.CreateDocument(root)
+	if err != nil {
+		return nil, err
+	}
+
+	return dom.CreateDocument(root), nil
 }
 
 func main() {

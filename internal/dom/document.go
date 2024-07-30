@@ -124,11 +124,9 @@ func (d Document) findAllByCondition(conditionFn func(Element) bool, el Element)
 	for _, child := range el.Children {
 		res, err := d.findAllByCondition(conditionFn, child)
 
-		if err != nil {
-			continue
+		if err == nil {
+			matches = append(matches, res...)
 		}
-
-		matches = append(matches, res...)
 	}
 
 	if len(matches) == 0 {

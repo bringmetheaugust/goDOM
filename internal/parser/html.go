@@ -6,14 +6,12 @@ import (
 	"strings"
 )
 
-// TODO: parent Tag, FirstChild, LastChild
 // Parse HTML from markup. Get DOM tree.
-func ParseHTML(markup string) (dom.Element, error) {
-	markup = strings.ReplaceAll(markup, `"`, `'`) // cause string() shielding /"
-	markup = strings.TrimSpace(markup)
+func ParseHTML(markup string) (*dom.Element, error) {
+	markup = normalize(markup)
 
 	if len(markup) == 0 {
-		return dom.Element{}, errors.InvalidRequest{Place: "ParseHTML"}
+		return &dom.Element{}, errors.InvalidRequest{Place: "ParseHTML"}
 	}
 
 	var parentStack []dom.Element
@@ -22,8 +20,7 @@ func ParseHTML(markup string) (dom.Element, error) {
 
 	for _, token := range tokenize(markup) {
 		switch {
-		// ? Self-closing tag (for XHTML)
-		case strings.HasPrefix(token, "<") && strings.HasSuffix(token, "/>"):
+		case strings.HasPrefix(token, "<") && strings.HasSuffix(token, "/>"): // ? Self-closing tag (for XHTML)
 			tag := parseTag(token[1 : len(token)-2])
 			newEl := dom.Element{TagName: tag.name, Attributes: tag.attributes}
 
@@ -32,7 +29,7 @@ func ParseHTML(markup string) (dom.Element, error) {
 			} else {
 				root = newEl
 			}
-		case strings.HasPrefix(token, "</"): // Closing tag
+		case strings.HasPrefix(token, "</"): // Tag closes
 			if currEl != nil {
 				parentStack = append(parentStack, *currEl)
 			}
@@ -43,26 +40,26 @@ func ParseHTML(markup string) (dom.Element, error) {
 				panic("unmatched closing tag")
 			}
 
-			top := parentStack[len(parentStack)-1]
+			topFromParentStack := &parentStack[len(parentStack)-1]
 			parentStack = parentStack[:len(parentStack)-1]
 
-			if top.TagName != tagName {
+			if topFromParentStack.TagName != tagName {
 				panic("mismatched closing tag")
 			}
 
 			if currEl != nil {
-				top.TextContent = currEl.TextContent
+				topFromParentStack.TextContent = currEl.TextContent
 			}
 
 			if len(parentStack) > 0 {
 				parent := &parentStack[len(parentStack)-1]
-				parent.Children = append(parent.Children, top)
+				parent.Children = append(parent.Children, *topFromParentStack)
 			} else {
-				root = top
+				root = *topFromParentStack
 			}
 
 			currEl = nil
-		case strings.HasPrefix(token, "<"): // Opening tag
+		case strings.HasPrefix(token, "<"): // New tag
 			tag := parseTag(token[1 : len(token)-1])
 			newEl := dom.Element{TagName: tag.name, Attributes: tag.attributes}
 
@@ -83,6 +80,7 @@ func ParseHTML(markup string) (dom.Element, error) {
 			if currEl != nil {
 				parentStack = append(parentStack, *currEl)
 				currEl.Children = append(currEl.Children, newEl)
+				newEl.ParentElement = currEl
 			}
 
 			currEl = &newEl
@@ -97,34 +95,5 @@ func ParseHTML(markup string) (dom.Element, error) {
 		panic("unmatched opening tags")
 	}
 
-	return root, nil
-}
-
-func tokenize(input string) []string {
-	var tokens []string
-	var currentToken strings.Builder
-
-	for i := 0; i < len(input); i++ {
-		switch input[i] {
-		case '<':
-			if currentToken.Len() > 0 {
-				tokens = append(tokens, currentToken.String())
-				currentToken.Reset()
-			}
-
-			currentToken.WriteByte('<')
-		case '>':
-			currentToken.WriteByte('>')
-			tokens = append(tokens, currentToken.String())
-			currentToken.Reset()
-		default:
-			currentToken.WriteByte(input[i])
-		}
-	}
-
-	if currentToken.Len() > 0 {
-		tokens = append(tokens, currentToken.String())
-	}
-
-	return tokens
+	return &root, nil
 }
