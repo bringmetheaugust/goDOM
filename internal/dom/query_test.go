@@ -74,10 +74,7 @@ func Test_parseQuery(t *testing.T) {
 				continue
 			}
 
-			t.Error(
-				"\nfor", pair.value,
-				"\nexpected error",
-			)
+			t.Error("\nfor", pair.value, "\nexpected error")
 
 			continue
 		}

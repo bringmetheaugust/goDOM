@@ -1,8 +1,8 @@
 package parser
 
 import (
-	"goDOM/internal/dom"
-	"goDOM/internal/errors"
+	"github.com/bringmetheaugust/goDOM/internal/dom"
+	"github.com/bringmetheaugust/goDOM/internal/errors"
 )
 
 // Prepare and parse markup. Get DOM-like element tree.
@@ -13,7 +13,7 @@ func Parse(markup string) (*dom.Element, error) {
 		return &dom.Element{}, errors.InvalidRequest{Place: "markup is an empty string."}
 	}
 
-	parsedMarkup := parse(markup)
+	parsedMarkup := parseMarkup(markup)
 
 	return parsedMarkup, nil
 }

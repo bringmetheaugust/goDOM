@@ -1,12 +1,13 @@
 package parser
 
 import (
-	"goDOM/internal/dom"
 	"strings"
+
+	"github.com/bringmetheaugust/goDOM/internal/dom"
 )
 
 // Parse markup. Get DOM-like element tree.
-func parse(markup string) *dom.Element {
+func parseMarkup(markup string) *dom.Element {
 	var parentStack []dom.Element
 	var root dom.Element
 	var currEl *dom.Element
@@ -52,6 +53,8 @@ func parse(markup string) *dom.Element {
 			}
 
 			currEl = nil
+		case strings.HasPrefix(token, "<!"): // skip doctype and comments
+			continue
 		case strings.HasPrefix(token, "<"): // new tag
 			tag := parseTag(token[1 : len(token)-1])
 			newEl := dom.Element{TagName: tag.name, Attributes: tag.attributes}
@@ -77,12 +80,14 @@ func parse(markup string) *dom.Element {
 			}
 
 			currEl = &newEl
-		case strings.HasPrefix(token, "<!"): // skip doctype and comments
-			continue
 		default: // Element inner context
 			if currEl != nil {
 				currEl.TextContent += token
+
+				continue
 			}
+
+			parentStack[len(parentStack)-1].TextContent += token
 		}
 	}
 

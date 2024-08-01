@@ -1,4 +1,4 @@
-module goDOM
+module github.com/bringmetheaugust/goDOM
 
 go 1.21.5
 

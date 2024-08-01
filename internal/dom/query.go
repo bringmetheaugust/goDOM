@@ -1,9 +1,10 @@
 package dom
 
 import (
-	"goDOM/internal/errors"
 	"regexp"
 	"strings"
+
+	"github.com/bringmetheaugust/goDOM/internal/errors"
 )
 
 type query struct {
@@ -24,8 +25,14 @@ func parseQuery(qStr string) (*query, error) {
 	return createQuery(queries...), nil
 }
 
-// TODO refactoring
-// create query struct
+// Get query param from regExp
+func matchedQueryParam(str string, q string) [][]string {
+	reTag := regexp.MustCompile(str)
+
+	return reTag.FindAllStringSubmatch(q, -1)
+}
+
+// Create query struct
 func createQuery(qArr ...string) *query {
 	if len(qArr) == 0 {
 		return nil
@@ -35,32 +42,24 @@ func createQuery(qArr ...string) *query {
 	newQ := query{}
 
 	// get tagName
-	reTag := regexp.MustCompile(`^(\w+)(?:\.|#|$)`)
-	matchedTag := reTag.FindAllStringSubmatch(q, -1)
-
+	matchedTag := matchedQueryParam(`^(\w+)(?:\.|#|$)`, q)
 	if len(matchedTag) > 0 {
 		newQ.tagName = matchedTag[0][1]
 	}
 
 	// get classes
 	var classList []string
-	reCLass := regexp.MustCompile(`(?:\.)([\w-]+)`)
-	matchedClasses := reCLass.FindAllStringSubmatch(q, -1)
-
+	matchedClasses := matchedQueryParam(`(?:\.)([\w-]+)`, q)
 	for _, class := range matchedClasses {
 		classList = append(classList, class[1])
 	}
-
 	newQ.classList = classList
 
 	// get id
-	reId := regexp.MustCompile(`(?:#)([\w-]+)`)
-	matchedId := reId.FindAllStringSubmatch(q, -1)
-
+	matchedId := matchedQueryParam(`(?:#)([\w-]+)`, q)
 	if len(matchedId) > 0 {
 		newQ.id = matchedId[0][1]
 	}
-
 	newQ.child = createQuery(qArr[1:]...)
 
 	return &newQ

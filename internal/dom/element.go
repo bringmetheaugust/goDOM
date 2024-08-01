@@ -1,6 +1,6 @@
 package dom
 
-import "goDOM/internal/errors"
+import "github.com/bringmetheaugust/goDOM/internal/errors"
 
 type Attributes map[string]string
 type Element struct {

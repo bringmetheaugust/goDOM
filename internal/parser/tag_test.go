@@ -1,9 +1,9 @@
 package parser
 
 import (
-	"goDOM/internal/dom"
 	"testing"
 
+	"github.com/bringmetheaugust/goDOM/internal/dom"
 	"github.com/stretchr/testify/assert"
 )
 

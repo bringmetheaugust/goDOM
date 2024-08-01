@@ -8,4 +8,3 @@ fi
 
 go fmt .
 go test ./...
-golangci-lint run

@@ -1,9 +1,10 @@
 package dom
 
 import (
-	"goDOM/internal/errors"
-	"goDOM/tools"
 	"slices"
+
+	"github.com/bringmetheaugust/goDOM/internal/errors"
+	"github.com/bringmetheaugust/goDOM/tools"
 )
 
 type Document struct {

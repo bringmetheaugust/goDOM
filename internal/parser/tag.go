@@ -1,8 +1,9 @@
 package parser
 
 import (
-	"goDOM/internal/dom"
 	"regexp"
+
+	"github.com/bringmetheaugust/goDOM/internal/dom"
 )
 
 type tag struct {
