@@ -1,11 +1,8 @@
 package parser
 
-import (
-	"strings"
-)
+import "strings"
 
 // Divide HTML to tokens. Each token is a HTML node.
-// Ignore <!Tag>, comments and script's tags.
 func tokenize(input string) []string {
 	var tokens []string
 	var currentToken strings.Builder
@@ -21,39 +18,54 @@ func tokenize(input string) []string {
 
 			currentToken.WriteByte('<')
 		case '>':
-			cT := currentToken.String()
+			currentToken.WriteByte('>')
 
-			// close <! || close comment || script ends || style ends
-			if (isTrash && strings.HasPrefix(cT, "<!") && !strings.HasPrefix(cT, "<!--")) || (isTrash && strings.HasSuffix(cT, "--")) || strings.HasSuffix(cT, "</script") || strings.HasSuffix(cT, "</style") {
+			switch t := currentToken.String(); {
+			case strings.HasSuffix(t, "-->"), strings.HasPrefix(t, "<script"), strings.HasPrefix(t, "<style"): // comment is closing || script or style are opening
+				tokens = append(tokens, currentToken.String())
 				currentToken.Reset()
+
+				isTrash = !isTrash
+
+				continue
+			case strings.HasSuffix(t, "</style>"): // style is closing
+				content := currentToken.String()[:len(currentToken.String())-8]
+
+				if content != "" {
+					tokens = append(tokens, content)
+				}
+
+				tokens = append(tokens, "</style>")
+				currentToken.Reset()
+
 				isTrash = false
 
 				continue
-			}
+			case strings.HasSuffix(t, "</script>"): // script is closing
+				content := currentToken.String()[:len(currentToken.String())-9]
 
-			// open script or style
-			if cT == "<script" || strings.HasPrefix(cT, "<style") {
-				isTrash = true
+				if content != "" {
+					tokens = append(tokens, content)
+				}
+
+				tokens = append(tokens, "</script>")
+				currentToken.Reset()
+
+				isTrash = false
 
 				continue
-			}
-
-			// simple tag closing || opening
-			if !isTrash {
-				currentToken.WriteByte('>')
+			case !isTrash: // simple tag closing
 				tokens = append(tokens, currentToken.String())
 				currentToken.Reset()
 
 				continue
 			}
-
-			currentToken.WriteByte('>')
-		case '!':
-			if currentToken.String() == "<" {
+		case '-':
+			if currentToken.String() == "<!-" {
 				isTrash = true
 			}
 
-			currentToken.WriteByte('!')
+			currentToken.WriteByte('-')
 		default:
 			currentToken.WriteByte(input[i])
 		}

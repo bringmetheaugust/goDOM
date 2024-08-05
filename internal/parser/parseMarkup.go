@@ -53,6 +53,8 @@ func parseMarkup(markup string) *dom.Element {
 			}
 
 			currEl = nil
+		case strings.HasPrefix(token, "<!"): // skip doctype and comments
+			continue
 		case strings.HasPrefix(token, "<"): // new tag
 			tag := parseTag(token[1 : len(token)-1])
 			newEl := dom.Element{TagName: tag.name, Attributes: tag.attributes}
