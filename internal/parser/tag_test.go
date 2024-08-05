@@ -14,7 +14,7 @@ type tagTestPair struct {
 
 var tagTests = [...]tagTestPair{
 	{
-		"div class='lol lil lop' hidden data-set='1 2 3' data_mid='wi-fi'",
+		"<div class='lol lil lop' hidden data-set='1 2 3' data_mid='wi-fi'>",
 		tag{name: "div", attributes: dom.Attributes{
 			"class":    "lol lil lop",
 			"hidden":   "",
@@ -23,13 +23,32 @@ var tagTests = [...]tagTestPair{
 		}},
 	},
 	{
-		"div class='lol'",
+		"<div class='lol lil lop' hidden data-set='1 2 3' data_mid='wi-fi'/>",
+		tag{name: "div", attributes: dom.Attributes{
+			"class":    "lol lil lop",
+			"hidden":   "",
+			"data-set": "1 2 3",
+			"data_mid": "wi-fi",
+		}},
+	},
+	{
+		"<div class='lol'>",
 		tag{name: "div", attributes: dom.Attributes{
 			"class": "lol",
 		}},
 	},
 	{
-		"div",
+		"<div class='lol'/>",
+		tag{name: "div", attributes: dom.Attributes{
+			"class": "lol",
+		}},
+	},
+	{
+		"<div>",
+		tag{"div", nil},
+	},
+	{
+		"<div/>",
 		tag{"div", nil},
 	},
 }

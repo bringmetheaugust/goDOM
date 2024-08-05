@@ -2,6 +2,7 @@ package parser
 
 import (
 	"regexp"
+	"strings"
 
 	"github.com/bringmetheaugust/goDOM/internal/dom"
 )
@@ -11,12 +12,19 @@ type tag struct {
 	attributes dom.Attributes
 }
 
-// Parse tokenized tag (without </>). Get tag name and rest attributes.
+// Parse tokenized tag. Get tag name and rest attributes.
 func parseTag(markup string) tag {
+	var tagStr string
 	attributes := make(dom.Attributes)
 
+	if strings.HasSuffix(markup, "/>") {
+		tagStr = markup[1 : len(markup)-2]
+	} else {
+		tagStr = markup[1 : len(markup)-1]
+	}
+
 	re := regexp.MustCompile(`([^\s=]+='[^']*'|[^\s=]+)`)
-	tagSplited := re.FindAllString(markup, -1)
+	tagSplited := re.FindAllString(tagStr, -1)
 
 	for _, attr := range tagSplited[1:] {
 		attr := parseAttribute(attr)

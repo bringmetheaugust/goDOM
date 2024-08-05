@@ -15,6 +15,20 @@ var htmlExpect = &dom.Element{
 	Attributes: dom.Attributes{"lang": "en"},
 	Children: []dom.Element{
 		{
+			TagName: "head",
+			Children: []dom.Element{
+				{
+					TagName:    "meta",
+					Attributes: dom.Attributes{"charset": "UTF-8"},
+				},
+				{
+					TagName:    "link",
+					Attributes: dom.Attributes{"href": "ururu", "id": "lolipop"},
+					Id:         "lolipop",
+				},
+			},
+		},
+		{
 			TagName: "body",
 			Children: []dom.Element{
 				{
@@ -94,6 +108,7 @@ var htmlExpect = &dom.Element{
 	},
 }
 var ignoredTestFields = []string{"ParentElement"}
+var testFilePaths = []string{"../../test/parse_markup_html5.html", "../../test/parse_markup_xhtml.html"}
 
 // Remove ParentElement field from each Element in DOM tree.
 // Cann't add this field to [htmlExpect] variable cause ParentElement is a pointer to parent Element.
@@ -114,9 +129,11 @@ func mapDomForTesting(DOM *dom.Element) *dom.Element {
 func Test_parseMarkup(t *testing.T) {
 	fmt.Printf("\033[33;1m"+"Attention! This test is ignoring %v fields."+"\033[0m"+"\n", ignoredTestFields)
 
-	testFile, _ := os.ReadFile("../../test/parse_markup.html")
-	DOM, _ := Parse(string(testFile))
-	mapedDOM := mapDomForTesting(DOM) // map Elemenet struct and remove some fields
+	for _, testFilePath := range testFilePaths {
+		testFile, _ := os.ReadFile(testFilePath)
+		DOM, _ := Parse(string(testFile))
+		mapedDOM := mapDomForTesting(DOM) // map Elemenet struct and remove some fields
 
-	assert.EqualValuesf(t, htmlExpect, mapedDOM, "")
+		assert.EqualValuesf(t, htmlExpect, mapedDOM, "")
+	}
 }

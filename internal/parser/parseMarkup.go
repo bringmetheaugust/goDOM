@@ -1,29 +1,48 @@
 package parser
 
 import (
+	"slices"
 	"strings"
 
 	"github.com/bringmetheaugust/goDOM/internal/dom"
 )
+
+type docType string
+
+const (
+	html5 docType = "HTML5"
+	xhtml docType = "XHTML"
+)
+
+// self closing tags in HTML5
+var selfClosingTags = []string{
+	"area", "base", "br", "col", "embed", "hr", "img", "input",
+	"link", "meta", "param", "source", "track", "wbr",
+}
+
+// Check if tag is self-closing
+func isSelfClosingTag(tag string) bool {
+	return slices.Contains(selfClosingTags, tag)
+}
 
 // Parse markup. Get DOM-like element tree.
 func parseMarkup(markup string) *dom.Element {
 	var parentStack []dom.Element
 	var root dom.Element
 	var currEl *dom.Element
+	var docType docType
+	tokens := tokenize(markup)
 
-	for _, token := range tokenize(markup) {
+	switch {
+	case strings.HasPrefix(strings.ToLower(tokens[0]), "<!doctype html public '-//w3c//dtd xhtml"):
+		docType = xhtml
+	default:
+		docType = html5
+	}
+
+	for _, token := range tokens {
 		switch {
-		case strings.HasPrefix(token, "<") && strings.HasSuffix(token, "/>"): // ? self-closing tag (for XHTML)
-			tag := parseTag(token[1 : len(token)-2])
-			newEl := dom.Element{TagName: tag.name, Attributes: tag.attributes}
-
-			if currEl != nil {
-				currEl.Children = append(currEl.Children, newEl)
-			} else {
-				root = newEl
-			}
-		case strings.HasPrefix(token, "</"): // tag closes
+		case strings.HasPrefix(token, "</"): // tag is closing
 			if currEl != nil {
 				parentStack = append(parentStack, *currEl)
 			}
@@ -53,10 +72,12 @@ func parseMarkup(markup string) *dom.Element {
 			}
 
 			currEl = nil
+
+			continue
 		case strings.HasPrefix(token, "<!"): // skip doctype and comments
 			continue
-		case strings.HasPrefix(token, "<"): // new tag
-			tag := parseTag(token[1 : len(token)-1])
+		case strings.HasPrefix(token, "<"): // new element
+			tag := parseTag(token)
 			newEl := dom.Element{TagName: tag.name, Attributes: tag.attributes}
 
 			for k, v := range tag.attributes {
@@ -73,13 +94,23 @@ func parseMarkup(markup string) *dom.Element {
 				}
 			}
 
-			if currEl != nil {
-				parentStack = append(parentStack, *currEl)
-				currEl.Children = append(currEl.Children, newEl)
-				newEl.ParentElement = currEl
+			if strings.HasSuffix(token, "/>") || (docType == html5 && isSelfClosingTag(tag.name)) { // self-closing tags
+				if currEl != nil {
+					currEl.Children = append(currEl.Children, newEl)
+				} else {
+					root = newEl
+				}
+			} else { // tag opening ends
+				if currEl != nil {
+					parentStack = append(parentStack, *currEl)
+					currEl.Children = append(currEl.Children, newEl)
+					newEl.ParentElement = currEl
+				}
+
+				currEl = &newEl
 			}
 
-			currEl = &newEl
+			continue
 		default: // Element inner context
 			if currEl != nil {
 				currEl.TextContent += token
