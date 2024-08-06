@@ -1,4 +1,4 @@
-package dom
+package goDom
 
 import "testing"
 
@@ -22,7 +22,7 @@ var hasAttributeTests = []elementTestPair{
 }
 
 var mockElement = Element{
-	Attributes: Attributes{
+	Attributes: attributes{
 		"href":   "http://pizdets.com",
 		"hidden": "",
 	},

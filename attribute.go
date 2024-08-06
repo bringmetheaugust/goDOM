@@ -1,8 +1,6 @@
-package parser
+package goDom
 
-import (
-	"strings"
-)
+import "strings"
 
 type attribute struct {
 	name  string

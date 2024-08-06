@@ -1,10 +1,8 @@
-package parser
+package goDom
 
 import (
 	"slices"
 	"strings"
-
-	"github.com/bringmetheaugust/goDOM/internal/dom"
 )
 
 type docType string
@@ -20,16 +18,29 @@ var selfClosingTags = []string{
 	"link", "meta", "param", "source", "track", "wbr",
 }
 
+// Prepare and parse markup. Get DOM-like element tree.
+func parse(markup string) (*Element, error) {
+	markup = normalize(markup)
+
+	if len(markup) == 0 {
+		return &Element{}, invalidRequestErr{Place: "markup is an empty string."}
+	}
+
+	parsedMarkup := parseMarkup(markup)
+
+	return parsedMarkup, nil
+}
+
 // Check if tag is self-closing
 func isSelfClosingTag(tag string) bool {
 	return slices.Contains(selfClosingTags, tag)
 }
 
 // Parse markup. Get DOM-like element tree.
-func parseMarkup(markup string) *dom.Element {
-	var parentStack []dom.Element
-	var root dom.Element
-	var currEl *dom.Element
+func parseMarkup(markup string) *Element {
+	var parentStack []Element
+	var root Element
+	var currEl *Element
 	var docType docType
 	tokens := tokenize(markup)
 
@@ -78,7 +89,7 @@ func parseMarkup(markup string) *dom.Element {
 			continue
 		case strings.HasPrefix(token, "<"): // new element
 			tag := parseTag(token)
-			newEl := dom.Element{TagName: tag.name, Attributes: tag.attributes}
+			newEl := Element{TagName: tag.name, Attributes: tag.attributes}
 
 			for k, v := range tag.attributes {
 				switch {
@@ -98,7 +109,8 @@ func parseMarkup(markup string) *dom.Element {
 				if currEl != nil {
 					currEl.Children = append(currEl.Children, newEl)
 				} else {
-					root = newEl
+					topFromParentStack := &parentStack[len(parentStack)-1]
+					topFromParentStack.Children = append(topFromParentStack.Children, newEl)
 				}
 			} else { // tag opening ends
 				if currEl != nil {

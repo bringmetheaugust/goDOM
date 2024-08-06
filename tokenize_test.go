@@ -1,4 +1,4 @@
-package parser
+package goDom
 
 import (
 	"os"
@@ -6,29 +6,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 )
-
-// var tokenizeExpect = []string{
-// 	"<!DOCTYPE html>",
-// 	"<html lang='ua'>",
-// 	"<head>",
-// 	"<title>",
-// 	"Test tokenize",
-// 	"</title>",
-// 	"<link type='stylesheet' href='/LICENSE' />",
-// 	"<link type='xml/text' href='/README.md' />",
-// 	"</head>",
-// 	"<body>",
-// 	"<ul>",
-// 	"<li>",
-// 	"li 1",
-// 	"</li>",
-// 	"<li>",
-// 	"li 2",
-// 	"</li>",
-// 	"</ul>",
-// 	"</body>",
-// 	"</html>",
-// }
 
 var tokenizeExpect = []string{
 	"<!DOCTYPE html>",
@@ -68,7 +45,7 @@ var tokenizeExpect = []string{
 }
 
 func Test_tokenize(t *testing.T) {
-	testFile, _ := os.ReadFile("../../test/tokenize.html")
+	testFile, _ := os.ReadFile("./test/tokenize.html")
 	testFileStr := normalize(string(testFile))
 	v := tokenize(testFileStr)
 

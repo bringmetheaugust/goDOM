@@ -1,9 +1,8 @@
-package parser
+package goDom
 
 import (
 	"testing"
 
-	"github.com/bringmetheaugust/goDOM/internal/dom"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,7 +14,7 @@ type tagTestPair struct {
 var tagTests = [...]tagTestPair{
 	{
 		"<div class='lol lil lop' hidden data-set='1 2 3' data_mid='wi-fi'>",
-		tag{name: "div", attributes: dom.Attributes{
+		tag{name: "div", attributes: attributes{
 			"class":    "lol lil lop",
 			"hidden":   "",
 			"data-set": "1 2 3",
@@ -24,7 +23,7 @@ var tagTests = [...]tagTestPair{
 	},
 	{
 		"<div class='lol lil lop' hidden data-set='1 2 3' data_mid='wi-fi'/>",
-		tag{name: "div", attributes: dom.Attributes{
+		tag{name: "div", attributes: attributes{
 			"class":    "lol lil lop",
 			"hidden":   "",
 			"data-set": "1 2 3",
@@ -33,13 +32,13 @@ var tagTests = [...]tagTestPair{
 	},
 	{
 		"<div class='lol'>",
-		tag{name: "div", attributes: dom.Attributes{
+		tag{name: "div", attributes: attributes{
 			"class": "lol",
 		}},
 	},
 	{
 		"<div class='lol'/>",
-		tag{name: "div", attributes: dom.Attributes{
+		tag{name: "div", attributes: attributes{
 			"class": "lol",
 		}},
 	},

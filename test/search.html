@@ -2,6 +2,7 @@
 <html lang="en">
     <head>
         <title>Let's try query selector</title>
+        <link type="style">
     </head>
 	<body>
         <header>
@@ -15,7 +16,10 @@
                         <h4>nav item 3</h4>
                         <ul id="sub_item_list">
                             <li class="white">sub item 1</li>
-                            <li class="white">sub item 2</li>
+                            <li class="white">
+                                sub item 2
+                                <span class="top">top</span>
+                            </li>
                         </ul>
                     </li>
                 </ul>
@@ -27,7 +31,9 @@
         </header>
 		<main>
 			<div>
-                <img src="http://zalupa.img.com" width="50" height="50" />
+                <address class="homi">home 1</address>
+                <img src="http://zalupa.img.com" width="50" height="100">
+                <address class="homi homo">home 2</address>
             </div>
 		</main>
         <footer>
@@ -37,14 +43,20 @@
                     <ul>
                         <li class="red">nav item 1</li>
                         <li class="red">
-                            <h4>nav item 2</h4>
+                            <h4 id="hh">nav item 2</h4>
                             <ul>
                                 <li class="white">sub item 1</li>
                                 <li class="white">sub item 2</li>
                             </ul>
                         </li>
                         <li class="red">nav item 3</li>
+                        <li class="yellow">nav item 4</li>
+                        <li class="yellow itt">nav item 5</li>
                     </ul>
+                    <div class="button">
+                        <button disabled>delete</button>
+                        <button>close</button>
+                    </div>
                 </nav>
             </div>
         </footer>

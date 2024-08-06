@@ -1,16 +1,23 @@
-package dom
+package goDom
 
 import (
 	"slices"
 
-	"github.com/bringmetheaugust/goDOM/internal/errors"
 	"github.com/bringmetheaugust/goDOM/tools"
 )
 
+// DOM tree with DOM API.
 type Document struct {
 	root Element
 }
 
+// Find element by query selector. Exactly as document.querySelector() in browser DOM.
+//
+// Example:
+//
+// element, err := document.QuerySelector("div#lal .lol")
+// if err != nil {return} // if element doesn't exist in DOM tree
+// fmt.Println(element) // print finded element
 func (d Document) QuerySelector(queryStr string) (Element, error) {
 	q, err := parseQuery(queryStr)
 
@@ -21,6 +28,13 @@ func (d Document) QuerySelector(queryStr string) (Element, error) {
 	return d.findElementByQuery(*q, d.root)
 }
 
+// Find elements by query selector. Exactly as document.querySelectorAll() in browser DOM.
+//
+// Example:
+//
+// elements, err := document.QuerySelector("#my_lol .lolipop")
+// if err != nil {return} // if elements don't exist in DOM tree
+// fmt.Println(elements) // print finded elements
 func (d Document) QuerySelectorAll(queryStr string) ([]Element, error) {
 	q, err := parseQuery(queryStr)
 
@@ -37,6 +51,13 @@ func (d Document) QuerySelectorAll(queryStr string) ([]Element, error) {
 	return res, nil
 }
 
+// Find element by id. Exactly as document.getElementById() in browser DOM.
+//
+// Example:
+//
+// element, err := document.GetElementById("piu")
+// if err != nil {return} // if element doesn't exist in DOM tree
+// fmt.Println(element) // print finded element
 func (d Document) GetElementById(id string) (Element, error) {
 	res, err := d.findByField("Id", id, d.root)
 
@@ -47,6 +68,13 @@ func (d Document) GetElementById(id string) (Element, error) {
 	return res[0], nil
 }
 
+// Find elements by CSS class name. Exactly as document.getElementsByClassName() in browser DOM.
+//
+// Example:
+//
+// elements, err := document.GetElementsByClassName(".lolipop")
+// if err != nil {return} // if elements don't exist in DOM tree
+// fmt.Println(elements) // print finded elements
 func (d Document) GetElementsByClassName(class string) ([]Element, error) {
 	conditionFn := func(el Element) bool {
 		return slices.Contains(el.ClassList, class)
@@ -55,8 +83,20 @@ func (d Document) GetElementsByClassName(class string) ([]Element, error) {
 	return d.findAllByCondition(conditionFn, d.root)
 }
 
+// Find elements by tag name. Exactly as document.getElementsByTagName() in browser DOM.
+//
+// Example:
+//
+// elements, err := document.GetElementsByTagName("li")
+// if err != nil {return} // if elements don't exist in DOM tree
+// fmt.Println(elements) // print finded elements
 func (d Document) GetElementsByTagName(tag string) ([]Element, error) {
 	return d.findByField("TagName", tag, d.root)
+}
+
+// Create new document.
+func createDocument(rootEl *Element) *Document {
+	return &Document{root: *rootEl}
 }
 
 // * Helpers
@@ -161,7 +201,7 @@ func (d Document) findAllByCondition(conditionFn func(Element) bool, el Element)
 	}
 
 	if len(matches) == 0 {
-		return nil, errors.NotFound{}
+		return nil, notFoundErr{}
 	}
 
 	return matches, nil
@@ -183,7 +223,7 @@ func (d Document) findOneByCondition(conditionFn func(Element) bool, el Element)
 		return res, nil
 	}
 
-	return Element{}, errors.NotFound{}
+	return Element{}, notFoundErr{}
 }
 
 // Find elements by attribute.

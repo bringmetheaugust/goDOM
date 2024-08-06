@@ -1,10 +1,8 @@
-package dom
+package goDom
 
 import (
 	"regexp"
 	"strings"
-
-	"github.com/bringmetheaugust/goDOM/internal/errors"
 )
 
 type query struct {
@@ -17,7 +15,7 @@ type query struct {
 // Parse and get query as struct.
 func parseQuery(qStr string) (*query, error) {
 	if qStr == "" {
-		return &query{}, errors.InvalidQuery{QueryStr: qStr}
+		return &query{}, invalidQueryErr{QueryStr: qStr}
 	}
 
 	queries := strings.Fields(qStr)

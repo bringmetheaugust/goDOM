@@ -1,21 +1,19 @@
-package parser
+package goDom
 
 import (
 	"regexp"
 	"strings"
-
-	"github.com/bringmetheaugust/goDOM/internal/dom"
 )
 
 type tag struct {
 	name       string
-	attributes dom.Attributes
+	attributes attributes
 }
 
 // Parse tokenized tag. Get tag name and rest attributes.
 func parseTag(markup string) tag {
 	var tagStr string
-	attributes := make(dom.Attributes)
+	attributes := make(attributes)
 
 	if strings.HasSuffix(markup, "/>") {
 		tagStr = markup[1 : len(markup)-2]

@@ -1,60 +1,59 @@
-package parser
+package goDom
 
 import (
 	"fmt"
 	"os"
 	"testing"
 
-	"github.com/bringmetheaugust/goDOM/internal/dom"
 	"github.com/bringmetheaugust/goDOM/tools"
 	"github.com/stretchr/testify/assert"
 )
 
-var htmlExpect = &dom.Element{
+var htmlExpect = &Element{
 	TagName:    "html",
-	Attributes: dom.Attributes{"lang": "en"},
-	Children: []dom.Element{
+	Attributes: attributes{"lang": "en"},
+	Children: []Element{
 		{
 			TagName: "head",
-			Children: []dom.Element{
+			Children: []Element{
 				{
 					TagName:    "meta",
-					Attributes: dom.Attributes{"charset": "UTF-8"},
+					Attributes: attributes{"charset": "UTF-8"},
 				},
 				{
 					TagName:    "link",
-					Attributes: dom.Attributes{"href": "ururu", "id": "lolipop"},
+					Attributes: attributes{"href": "ururu", "id": "lolipop"},
 					Id:         "lolipop",
 				},
 			},
 		},
 		{
 			TagName: "body",
-			Children: []dom.Element{
+			Children: []Element{
 				{
 					TagName:    "ul",
-					Attributes: dom.Attributes{"class": "lol lul", "id": "ou"},
+					Attributes: attributes{"class": "lol lul", "id": "ou"},
 					Id:         "ou",
 					ClassName:  "lol lul",
 					ClassList:  []string{"lol", "lul"},
-					Children: []dom.Element{
+					Children: []Element{
 						{
 							TagName:     "li",
-							Attributes:  dom.Attributes{"id": "ouu"},
+							Attributes:  attributes{"id": "ouu"},
 							Id:          "ouu",
 							TextContent: "li 0",
-							Children: []dom.Element{
+							Children: []Element{
 								{
 									TagName:    "ul",
-									Attributes: dom.Attributes{"class": "two"},
+									Attributes: attributes{"class": "two"},
 									ClassName:  "two",
 									ClassList:  []string{"two"},
-									Children: []dom.Element{
+									Children: []Element{
 										{
 											TagName:     "li",
-											Attributes:  dom.Attributes{"href": "afa sada_1"},
+											Attributes:  attributes{"href": "afa sada_1"},
 											TextContent: "li 1",
-											Children: []dom.Element{
+											Children: []Element{
 												{
 													TagName:     "span",
 													TextContent: "ahaha from li 1",
@@ -64,9 +63,9 @@ var htmlExpect = &dom.Element{
 										},
 										{
 											TagName:     "li",
-											Attributes:  dom.Attributes{"href": "afa sada_2"},
+											Attributes:  attributes{"href": "afa sada_2"},
 											TextContent: "li 2",
-											Children: []dom.Element{
+											Children: []Element{
 												{
 													TagName:     "span",
 													TextContent: "ahaha from li 2",
@@ -76,13 +75,18 @@ var htmlExpect = &dom.Element{
 										},
 										{
 											TagName:     "li",
-											Attributes:  dom.Attributes{"href": "afa sada_3"},
+											Attributes:  attributes{"href": "afa sada_3"},
 											TextContent: "li 3li 3",
-											Children: []dom.Element{
+											Children: []Element{
 												{
 													TagName:     "span",
 													TextContent: "ahaha from li 3",
 													Children:    nil,
+												},
+												{
+													TagName:    "img",
+													Attributes: attributes{"src": "https://hell.com"},
+													Children:   nil,
 												},
 											},
 										},
@@ -95,7 +99,7 @@ var htmlExpect = &dom.Element{
 				{
 					TagName:     "button",
 					TextContent: "mm?",
-					Attributes:  dom.Attributes{"disabled": ""},
+					Attributes:  attributes{"disabled": ""},
 					Children:    nil,
 				},
 				{
@@ -108,13 +112,13 @@ var htmlExpect = &dom.Element{
 	},
 }
 var ignoredTestFields = []string{"ParentElement"}
-var testFilePaths = []string{"../../test/parse_markup_html5.html", "../../test/parse_markup_xhtml.html"}
+var testFilePaths = []string{"./test/parse_markup_html5.html", "./test/parse_markup_xhtml.html"}
 
 // Remove ParentElement field from each Element in DOM tree.
 // Cann't add this field to [htmlExpect] variable cause ParentElement is a pointer to parent Element.
-func mapDomForTesting(DOM *dom.Element) *dom.Element {
-	mapedStruct, _ := tools.СopyStructWithoutFields[dom.Element](*DOM, ignoredTestFields)
-	var childAcc []dom.Element
+func mapDomForTesting(DOM *Element) *Element {
+	mapedStruct, _ := tools.СopyStructWithoutFields[Element](*DOM, ignoredTestFields)
+	var childAcc []Element
 
 	for _, child := range mapedStruct.Children {
 		mapedChild := mapDomForTesting(&child)
@@ -131,7 +135,7 @@ func Test_parseMarkup(t *testing.T) {
 
 	for _, testFilePath := range testFilePaths {
 		testFile, _ := os.ReadFile(testFilePath)
-		DOM, _ := Parse(string(testFile))
+		DOM, _ := parse(string(testFile))
 		mapedDOM := mapDomForTesting(DOM) // map Elemenet struct and remove some fields
 
 		assert.EqualValuesf(t, htmlExpect, mapedDOM, "")

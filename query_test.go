@@ -1,4 +1,4 @@
-package dom
+package goDom
 
 import (
 	"testing"
@@ -7,13 +7,15 @@ import (
 )
 
 type queryTestPair struct {
-	value     string
-	expect    query
-	expectErr bool
+	description string
+	value       string
+	expect      query
+	expectErr   bool
 }
 
 var queryTests = [...]queryTestPair{
 	{
+		"Multistage query.",
 		"ul#lal li.lol span.lol_1.lol-2",
 		query{
 			tagName:   "ul",
@@ -34,31 +36,37 @@ var queryTests = [...]queryTestPair{
 		false,
 	},
 	{
+		"One stage query.",
 		"ul#lal.lol-1.lol-2.lol_3",
 		query{tagName: "ul", id: "lal", classList: []string{"lol-1", "lol-2", "lol_3"}, child: nil},
 		false,
 	},
 	{
+		"Compltex query.",
 		"ul#lal.lol",
 		query{tagName: "ul", id: "lal", classList: []string{"lol"}, child: nil},
 		false,
 	},
 	{
+		"Tag query.",
 		"div",
 		query{tagName: "div", id: "", classList: nil, child: nil},
 		false,
 	},
 	{
+		"Class query.",
 		".lol",
 		query{tagName: "", id: "", classList: []string{"lol"}, child: nil},
 		false,
 	},
 	{
+		"Id query.",
 		"#lal",
 		query{tagName: "", id: "lal", classList: nil, child: nil},
 		false,
 	},
 	{
+		"Query should pass error.",
 		"",
 		query{},
 		true,
@@ -74,11 +82,11 @@ func Test_parseQuery(t *testing.T) {
 				continue
 			}
 
-			t.Error("\nfor", pair.value, "\nexpected error")
+			t.Error(pair.description, ": \nfor", pair.value, "\nexpected error")
 
 			continue
 		}
 
-		assert.EqualValuesf(t, &pair.expect, v, "")
+		assert.EqualValuesf(t, &pair.expect, v, pair.description)
 	}
 }
