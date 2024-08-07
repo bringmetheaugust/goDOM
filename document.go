@@ -13,11 +13,11 @@ type Document struct {
 
 // Find element by query selector. Exactly as document.querySelector() in browser DOM.
 //
-// Example:
+// Examples:
 //
-// element, err := document.QuerySelector("div#lal .lol")
-// if err != nil {return} // if element doesn't exist in DOM tree
-// fmt.Println(element) // print finded element
+//	element, err := document.QuerySelector("div#lal .lol")
+//	if err != nil {return} // if element doesn't exist in DOM tree
+//	fmt.Println(element) // print finded element
 func (d Document) QuerySelector(queryStr string) (Element, error) {
 	q, err := parseQuery(queryStr)
 
@@ -30,34 +30,44 @@ func (d Document) QuerySelector(queryStr string) (Element, error) {
 
 // Find elements by query selector. Exactly as document.querySelectorAll() in browser DOM.
 //
-// Example:
+// Examples:
 //
-// elements, err := document.QuerySelector("#my_lol .lolipop")
-// if err != nil {return} // if elements don't exist in DOM tree
-// fmt.Println(elements) // print finded elements
+//	elements, err := document.QuerySelector("#my_lol .lolipop")
+//	if err != nil {return} // if elements don't exist in DOM tree
+//	fmt.Println(elements) // print finded elements
 func (d Document) QuerySelectorAll(queryStr string) ([]Element, error) {
-	q, err := parseQuery(queryStr)
+	queries, err := parseQueries(queryStr)
 
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := d.findElementsByQuery(*q, d.root)
+	var matches []Element
 
-	if len(res) == 0 {
-		return nil, err
+	for _, q := range queries {
+		res, err := d.findElementsByQuery(q, d.root)
+
+		if err != nil {
+			continue
+		}
+
+		matches = append(matches, res...)
 	}
 
-	return res, nil
+	if len(matches) == 0 {
+		return nil, notFoundErr{Params: "query: " + queryStr}
+	}
+
+	return matches, nil
 }
 
 // Find element by id. Exactly as document.getElementById() in browser DOM.
 //
-// Example:
+// Examples:
 //
-// element, err := document.GetElementById("piu")
-// if err != nil {return} // if element doesn't exist in DOM tree
-// fmt.Println(element) // print finded element
+//	element, err := document.GetElementById("piu")
+//	if err != nil {return} // if element doesn't exist in DOM tree
+//	fmt.Println(element) // print finded element
 func (d Document) GetElementById(id string) (Element, error) {
 	res, err := d.findByField("Id", id, d.root)
 
@@ -70,11 +80,11 @@ func (d Document) GetElementById(id string) (Element, error) {
 
 // Find elements by CSS class name. Exactly as document.getElementsByClassName() in browser DOM.
 //
-// Example:
+// Examples:
 //
-// elements, err := document.GetElementsByClassName(".lolipop")
-// if err != nil {return} // if elements don't exist in DOM tree
-// fmt.Println(elements) // print finded elements
+//	elements, err := document.GetElementsByClassName(".lolipop")
+//	if err != nil {return} // if elements don't exist in DOM tree
+//	fmt.Println(elements) // print finded elements
 func (d Document) GetElementsByClassName(class string) ([]Element, error) {
 	conditionFn := func(el Element) bool {
 		return slices.Contains(el.ClassList, class)
@@ -85,11 +95,11 @@ func (d Document) GetElementsByClassName(class string) ([]Element, error) {
 
 // Find elements by tag name. Exactly as document.getElementsByTagName() in browser DOM.
 //
-// Example:
+// Examples:
 //
-// elements, err := document.GetElementsByTagName("li")
-// if err != nil {return} // if elements don't exist in DOM tree
-// fmt.Println(elements) // print finded elements
+//	elements, err := document.GetElementsByTagName("li")
+//	if err != nil {return} // if elements don't exist in DOM tree
+//	fmt.Println(elements) // print finded elements
 func (d Document) GetElementsByTagName(tag string) ([]Element, error) {
 	return d.findByField("TagName", tag, d.root)
 }
@@ -112,9 +122,18 @@ func (d Document) elementMatchesQuery(q query) func(Element) bool {
 			return false
 		}
 
-		// check if all classes from query contains element
+		// check if each class from query contains element
 		for _, class := range q.classList {
 			if !slices.Contains(el.ClassList, class) {
+				return false
+			}
+		}
+
+		// check if each attribute from query contains element
+		for k, v := range q.attributes {
+			attr, ok := el.Attributes[k]
+
+			if !ok || (v != "" && v == attr) {
 				return false
 			}
 		}
@@ -145,6 +164,7 @@ func (d Document) findElementByQuery(q query, el Element) (Element, error) {
 func (d Document) findElementsByQuery(q query, el Element) ([]Element, error) {
 	var matches []Element
 
+	// find elements which match first query level
 	conditionFn := d.elementMatchesQuery(q)
 	res, err := d.findAllByCondition(conditionFn, el)
 

@@ -61,14 +61,14 @@ func parseMarkup(markup string) *Element {
 			tagName := token[2 : len(token)-1]
 
 			if len(parentStack) == 0 {
-				panic("unmatched closing tag")
+				panic("Error during parsing markup: unmatched closing tag.")
 			}
 
 			topFromParentStack := &parentStack[len(parentStack)-1]
 			parentStack = parentStack[:len(parentStack)-1]
 
 			if topFromParentStack.TagName != tagName {
-				panic("mismatched closing tag")
+				panic("Error during parsing markup: mismatched closing tag.")
 			}
 
 			if currEl != nil {

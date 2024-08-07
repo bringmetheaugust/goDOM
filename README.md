@@ -13,7 +13,8 @@
     <a href="https://cs4.pikabu.ru/post_img/big/2014/12/15/4/1418619408_1209550583.jpg"><img src="https://img.shields.io/badge/version-1.2.3-blue" alt="project version"></a>
 </p>
 
-Package provide method to parse HTML and get browser-like DOM and DOM API.
+Made by front-ender for front-enders.   
+Package provide method to parse HTML and get browser-like DOM and DOM API.  
 It's only for reading DOM, searching elements and getting their data.
 Doesn't have methods to mutate DOM.
 
@@ -21,7 +22,7 @@ Doesn't have methods to mutate DOM.
 
     go get github.com/bringmetheaugust/goDOM
 
-## Example
+## Examples
 
 ```go
 package motherfckrs

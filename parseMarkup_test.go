@@ -12,10 +12,10 @@ import (
 var htmlExpect = &Element{
 	TagName:    "html",
 	Attributes: attributes{"lang": "en"},
-	Children: []Element{
+	Children: children{
 		{
 			TagName: "head",
-			Children: []Element{
+			Children: children{
 				{
 					TagName:    "meta",
 					Attributes: attributes{"charset": "UTF-8"},
@@ -29,31 +29,31 @@ var htmlExpect = &Element{
 		},
 		{
 			TagName: "body",
-			Children: []Element{
+			Children: children{
 				{
 					TagName:    "ul",
 					Attributes: attributes{"class": "lol lul", "id": "ou"},
 					Id:         "ou",
 					ClassName:  "lol lul",
-					ClassList:  []string{"lol", "lul"},
-					Children: []Element{
+					ClassList:  classList{"lol", "lul"},
+					Children: children{
 						{
 							TagName:     "li",
 							Attributes:  attributes{"id": "ouu"},
 							Id:          "ouu",
 							TextContent: "li 0",
-							Children: []Element{
+							Children: children{
 								{
 									TagName:    "ul",
 									Attributes: attributes{"class": "two"},
 									ClassName:  "two",
-									ClassList:  []string{"two"},
-									Children: []Element{
+									ClassList:  classList{"two"},
+									Children: children{
 										{
 											TagName:     "li",
 											Attributes:  attributes{"href": "afa sada_1"},
 											TextContent: "li 1",
-											Children: []Element{
+											Children: children{
 												{
 													TagName:     "span",
 													TextContent: "ahaha from li 1",
@@ -65,7 +65,7 @@ var htmlExpect = &Element{
 											TagName:     "li",
 											Attributes:  attributes{"href": "afa sada_2"},
 											TextContent: "li 2",
-											Children: []Element{
+											Children: children{
 												{
 													TagName:     "span",
 													TextContent: "ahaha from li 2",
@@ -77,7 +77,7 @@ var htmlExpect = &Element{
 											TagName:     "li",
 											Attributes:  attributes{"href": "afa sada_3"},
 											TextContent: "li 3li 3",
-											Children: []Element{
+											Children: children{
 												{
 													TagName:     "span",
 													TextContent: "ahaha from li 3",

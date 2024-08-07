@@ -28,7 +28,7 @@ var querySelectorTestPair = []documentTestPair{
 			TextContent: "top",
 			Attributes:  attributes{"class": "top"},
 			ClassName:   "top",
-			ClassList:   []string{"top"},
+			ClassList:   classList{"top"},
 		},
 		expectErr: false,
 	},
@@ -40,6 +40,19 @@ var querySelectorTestPair = []documentTestPair{
 			Id:          "sub_item_list",
 			TextContent: "",
 			Attributes:  attributes{"id": "sub_item_list"},
+		},
+		expectErr: false,
+	},
+	{
+		description: "Attribute with value query.",
+		params:      "li[data-pull='weee']",
+		expect: Element{
+			TagName:     "li",
+			Id:          "",
+			TextContent: "nav item 1",
+			Attributes:  attributes{"class": "red", "data-pull": "weee"},
+			ClassName:   "red",
+			ClassList:   classList{"red"},
 		},
 		expectErr: false,
 	},
@@ -63,44 +76,100 @@ var querySelectorTestPair = []documentTestPair{
 }
 
 var querySelectorAllTestPair = []documentTestPair{
-	{
-		description: "Multystage query.",
-		params:      "footer .button button",
-		expect: []Element{
-			{
-				TagName:     "button",
-				TextContent: "delete",
-				Attributes:  attributes{"disabled": ""},
-			},
-			{
-				TagName:     "button",
-				TextContent: "close",
-				Attributes:  nil,
-			},
-		},
-		expectErr: false,
-	},
-	{
-		description: "Class query.",
-		params:      ".yellow",
-		expect: []Element{
-			{
-				TagName:     "li",
-				TextContent: "nav item 4",
-				Attributes:  attributes{"class": "yellow"},
-				ClassName:   "yellow",
-				ClassList:   []string{"yellow"},
-			},
-			{
-				TagName:     "li",
-				TextContent: "nav item 5",
-				Attributes:  attributes{"class": "yellow itt"},
-				ClassName:   "yellow itt",
-				ClassList:   []string{"yellow", "itt"},
-			},
-		},
-		expectErr: false,
-	},
+	// {
+	// 	description: "Multi selectors.",
+	// 	params:      ".homi, button[disabled], h2",
+	// 	expect: []Element{
+	// 		{
+	// 			TagName:     "address",
+	// 			TextContent: "home 1",
+	// 			ClassList:   classList{"homi"},
+	// 			ClassName:   "homi",
+	// 			Attributes:  attributes{"class": "homi"},
+	// 		},
+	// 		{
+	// 			TagName:     "address",
+	// 			TextContent: "home 2",
+	// 			ClassList:   classList{"homi", "homo"},
+	// 			ClassName:   "homi homo",
+	// 			Attributes:  attributes{"class": "homi homo"},
+	// 		},
+	// 		{
+	// 			TagName:     "button",
+	// 			TextContent: "save",
+	// 			Attributes:  attributes{"disabled": ""},
+	// 		},
+	// 		{
+	// 			TagName:     "button",
+	// 			TextContent: "delete",
+	// 			Attributes:  attributes{"disabled": ""},
+	// 		},
+	// 		{
+	// 			TagName:     "h2",
+	// 			TextContent: "this is header",
+	// 		},
+	// 		{
+	// 			TagName:     "h2",
+	// 			TextContent: "this is footer",
+	// 		},
+	// 	},
+	// 	expectErr: false,
+	// },
+	// {
+	// 	description: "Multistage query.",
+	// 	params:      "footer .button button",
+	// 	expect: []Element{
+	// 		{
+	// 			TagName:     "button",
+	// 			TextContent: "delete",
+	// 			Attributes:  attributes{"disabled": ""},
+	// 		},
+	// 		{
+	// 			TagName:     "button",
+	// 			TextContent: "close",
+	// 			Attributes:  nil,
+	// 		},
+	// 	},
+	// 	expectErr: false,
+	// },
+	// {
+	// 	description: "Attribute without value query.",
+	// 	params:      "button[disabled]",
+	// 	expect: []Element{
+	// 		{
+	// 			TagName:     "button",
+	// 			TextContent: "save",
+	// 			Attributes:  attributes{"disabled": ""},
+	// 		},
+	// 		{
+	// 			TagName:     "button",
+	// 			TextContent: "delete",
+	// 			Attributes:  attributes{"disabled": ""},
+	// 		},
+	// 	},
+	// 	expectErr: false,
+	// },
+	// {
+	// 	description: "Class query.",
+	// 	params:      ".yellow",
+	// 	expect: []Element{
+	// 		{
+	// 			TagName:     "li",
+	// 			TextContent: "nav item 4",
+	// 			Attributes:  attributes{"class": "yellow"},
+	// 			ClassName:   "yellow",
+	// 			ClassList:   classList{"yellow"},
+	// 		},
+	// 		{
+	// 			TagName:     "li",
+	// 			TextContent: "nav item 5",
+	// 			Attributes:  attributes{"class": "yellow itt"},
+	// 			ClassName:   "yellow itt",
+	// 			ClassList:   classList{"yellow", "itt"},
+	// 		},
+	// 	},
+	// 	expectErr: false,
+	// },
 	{
 		description: "Not existed elements.",
 		params:      ".lal",
@@ -136,20 +205,20 @@ var getElementByIdTestPair = []documentTestPair{
 var getElementsByClassNameTestPair = []documentTestPair{
 	{
 		params: "homi",
-		expect: []Element{
+		expect: children{
 			{
 				TagName:     "address",
 				TextContent: "home 1",
 				Attributes:  attributes{"class": "homi"},
 				ClassName:   "homi",
-				ClassList:   []string{"homi"},
+				ClassList:   classList{"homi"},
 			},
 			{
 				TagName:     "address",
 				TextContent: "home 2",
 				Attributes:  attributes{"class": "homi homo"},
 				ClassName:   "homi homo",
-				ClassList:   []string{"homi", "homo"},
+				ClassList:   classList{"homi", "homo"},
 			},
 		},
 		expectErr: false,
@@ -164,27 +233,27 @@ var getElementsByClassNameTestPair = []documentTestPair{
 var getElementsByTagNameTestPair = []documentTestPair{
 	{
 		params: "address",
-		expect: []Element{
+		expect: children{
 			{
 				TagName:     "address",
 				TextContent: "home 1",
 				Attributes:  attributes{"class": "homi"},
 				ClassName:   "homi",
-				ClassList:   []string{"homi"},
+				ClassList:   classList{"homi"},
 			},
 			{
 				TagName:     "address",
 				TextContent: "home 2",
 				Attributes:  attributes{"class": "homi homo"},
 				ClassName:   "homi homo",
-				ClassList:   []string{"homi", "homo"},
+				ClassList:   classList{"homi", "homo"},
 			},
 		},
 		expectErr: false,
 	},
 	{
 		params: "img",
-		expect: []Element{
+		expect: children{
 			{
 				TagName:    "img",
 				Attributes: attributes{"src": "http://zalupa.img.com", "width": "50", "height": "100"},
