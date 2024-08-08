@@ -17,7 +17,7 @@ type documentTestPair struct {
 
 var testFile, _ = os.ReadFile("./test/search.html")
 var document, _ = Create(testFile)
-var documnetIgnoredTestFields = []string{"ParentElement", "Children"}
+var documnetIgnoredTestFields = []string{"ParentElement", "Children", "domSearchAPI"}
 
 var querySelectorTestPair = []documentTestPair{
 	{
@@ -76,100 +76,100 @@ var querySelectorTestPair = []documentTestPair{
 }
 
 var querySelectorAllTestPair = []documentTestPair{
-	// {
-	// 	description: "Multi selectors.",
-	// 	params:      ".homi, button[disabled], h2",
-	// 	expect: []Element{
-	// 		{
-	// 			TagName:     "address",
-	// 			TextContent: "home 1",
-	// 			ClassList:   classList{"homi"},
-	// 			ClassName:   "homi",
-	// 			Attributes:  attributes{"class": "homi"},
-	// 		},
-	// 		{
-	// 			TagName:     "address",
-	// 			TextContent: "home 2",
-	// 			ClassList:   classList{"homi", "homo"},
-	// 			ClassName:   "homi homo",
-	// 			Attributes:  attributes{"class": "homi homo"},
-	// 		},
-	// 		{
-	// 			TagName:     "button",
-	// 			TextContent: "save",
-	// 			Attributes:  attributes{"disabled": ""},
-	// 		},
-	// 		{
-	// 			TagName:     "button",
-	// 			TextContent: "delete",
-	// 			Attributes:  attributes{"disabled": ""},
-	// 		},
-	// 		{
-	// 			TagName:     "h2",
-	// 			TextContent: "this is header",
-	// 		},
-	// 		{
-	// 			TagName:     "h2",
-	// 			TextContent: "this is footer",
-	// 		},
-	// 	},
-	// 	expectErr: false,
-	// },
-	// {
-	// 	description: "Multistage query.",
-	// 	params:      "footer .button button",
-	// 	expect: []Element{
-	// 		{
-	// 			TagName:     "button",
-	// 			TextContent: "delete",
-	// 			Attributes:  attributes{"disabled": ""},
-	// 		},
-	// 		{
-	// 			TagName:     "button",
-	// 			TextContent: "close",
-	// 			Attributes:  nil,
-	// 		},
-	// 	},
-	// 	expectErr: false,
-	// },
-	// {
-	// 	description: "Attribute without value query.",
-	// 	params:      "button[disabled]",
-	// 	expect: []Element{
-	// 		{
-	// 			TagName:     "button",
-	// 			TextContent: "save",
-	// 			Attributes:  attributes{"disabled": ""},
-	// 		},
-	// 		{
-	// 			TagName:     "button",
-	// 			TextContent: "delete",
-	// 			Attributes:  attributes{"disabled": ""},
-	// 		},
-	// 	},
-	// 	expectErr: false,
-	// },
-	// {
-	// 	description: "Class query.",
-	// 	params:      ".yellow",
-	// 	expect: []Element{
-	// 		{
-	// 			TagName:     "li",
-	// 			TextContent: "nav item 4",
-	// 			Attributes:  attributes{"class": "yellow"},
-	// 			ClassName:   "yellow",
-	// 			ClassList:   classList{"yellow"},
-	// 		},
-	// 		{
-	// 			TagName:     "li",
-	// 			TextContent: "nav item 5",
-	// 			Attributes:  attributes{"class": "yellow itt"},
-	// 			ClassName:   "yellow itt",
-	// 			ClassList:   classList{"yellow", "itt"},
-	// 		},
-	// 	},
-	// 	expectErr: false,
-	// },
+	{
+		description: "Multi selectors.",
+		params:      ".homi, button[disabled], h2",
+		expect: []Element{
+			{
+				TagName:     "address",
+				TextContent: "home 1",
+				ClassList:   classList{"homi"},
+				ClassName:   "homi",
+				Attributes:  attributes{"class": "homi"},
+			},
+			{
+				TagName:     "address",
+				TextContent: "home 2",
+				ClassList:   classList{"homi", "homo"},
+				ClassName:   "homi homo",
+				Attributes:  attributes{"class": "homi homo"},
+			},
+			{
+				TagName:     "button",
+				TextContent: "save",
+				Attributes:  attributes{"disabled": ""},
+			},
+			{
+				TagName:     "button",
+				TextContent: "delete",
+				Attributes:  attributes{"disabled": ""},
+			},
+			{
+				TagName:     "h2",
+				TextContent: "this is header",
+			},
+			{
+				TagName:     "h2",
+				TextContent: "this is footer",
+			},
+		},
+		expectErr: false,
+	},
+	{
+		description: "Multistage query.",
+		params:      "footer .button button",
+		expect: []Element{
+			{
+				TagName:     "button",
+				TextContent: "delete",
+				Attributes:  attributes{"disabled": ""},
+			},
+			{
+				TagName:     "button",
+				TextContent: "close",
+				Attributes:  nil,
+			},
+		},
+		expectErr: false,
+	},
+	{
+		description: "Attribute without value query.",
+		params:      "button[disabled]",
+		expect: []Element{
+			{
+				TagName:     "button",
+				TextContent: "save",
+				Attributes:  attributes{"disabled": ""},
+			},
+			{
+				TagName:     "button",
+				TextContent: "delete",
+				Attributes:  attributes{"disabled": ""},
+			},
+		},
+		expectErr: false,
+	},
+	{
+		description: "Class query.",
+		params:      ".yellow",
+		expect: []Element{
+			{
+				TagName:     "li",
+				TextContent: "nav item 4",
+				Attributes:  attributes{"class": "yellow"},
+				ClassName:   "yellow",
+				ClassList:   classList{"yellow"},
+			},
+			{
+				TagName:     "li",
+				TextContent: "nav item 5",
+				Attributes:  attributes{"class": "yellow itt"},
+				ClassName:   "yellow itt",
+				ClassList:   classList{"yellow", "itt"},
+			},
+		},
+		expectErr: false,
+	},
 	{
 		description: "Not existed elements.",
 		params:      ".lal",
