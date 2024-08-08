@@ -23,6 +23,7 @@ func СopyStructWithoutFields[T any](input T, fieldsToIgnore []string) (T, error
 
 	for i := 0; i < v.NumField(); i++ {
 		fieldName := t.Field(i).Name
+
 		if _, found := fieldSet[fieldName]; !found {
 			output.Field(i).Set(v.Field(i))
 		}

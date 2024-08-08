@@ -30,10 +30,11 @@ package motherfckrs
 import "github.com/bringmetheaugust/goDOM"
 
 func main() {
+    bytes := // HTML markup as bytes (from HTTP request, files, etc.)
     document, err := goDom.Create(bytes)       // create document (DOM with API, like in browser)
-    if err != nil {return}                     // if markup is invalid
+    if err != nil {return}                     // check if markup is invalid
     lol, err := document.QuerySelector("#lol") // <a id="lol" class="pipi" href="http://lol.com">
-    if err != nil {return}                     // if element not found
+    if err != nil {return}                     // check if element not found
     fmt.Println(lol.ClassList)                 // ["pipi"]
     fmt.Println(lol.Attributes)                // {"id": "lol", class: "pipi", "href": "http://lol.com"}
     fmt.Println(lol.GetAttribute("href"))      // "http://lol.com"
@@ -42,29 +43,38 @@ func main() {
 
 ## Docs
 
-### DOM API methods
+### Document
 
-* `QuerySelector`
-* `QuerySelectorAll`
-* `GetElementById`
-* `GetElementsByClassName`
-* `GetElementsByTagName`
+ * methods
 
-### DOM element's methods
+    * `QuerySelector` (doesn't support `*`, `>`, `+`, `~`, pseudo-elements, pseudo-classes)
+    * `QuerySelectorAll` (doesn't support `*`, `>`, `+`, `~`, pseudo-elements, pseudo-classes)
+    * `GetElementById`
+    * `GetElementsByClassName`
+    * `GetElementsByTagName`
 
-* `GetAttribute`
-* `HasAttribute`
+### Element
 
-### DOM element's fields
+ * methods
 
-* `TagName`
-* `TextContent`
-* `Attributes`
-* `Children`
-* `ClassName`
-* `ClassList`
-* `Id`
-* `ParentElement`
+    * `GetAttribute`
+    * `HasAttribute`
+    * `QuerySelector` (doesn't support `*`, `>`, `+`, `~`, pseudo-elements, pseudo-classes)
+    * `QuerySelectorAll` (doesn't support `*`, `>`, `+`, `~`, pseudo-elements, pseudo-classes)
+    * `GetElementById`
+    * `GetElementsByClassName`
+    * `GetElementsByTagName`
+
+ * fields
+
+    * `TagName`
+    * `TextContent` element text (ex. `innerHTML` in **DOM**)
+    * `Attributes`
+    * `Children`
+    * `ClassName`
+    * `ClassList`
+    * `Id`
+    * `ParentElement`
 
 ## Development
 

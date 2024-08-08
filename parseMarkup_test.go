@@ -111,7 +111,7 @@ var htmlExpect = &Element{
 		},
 	},
 }
-var ignoredTestFields = []string{"ParentElement"}
+var ignoredTestFields = []string{"ParentElement", "domSearchAPI"}
 var testFilePaths = []string{"./test/parse_markup_html5.html", "./test/parse_markup_xhtml.html"}
 
 // Remove ParentElement field from each Element in DOM tree.
