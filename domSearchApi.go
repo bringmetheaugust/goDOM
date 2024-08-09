@@ -184,6 +184,8 @@ func (a domSearchAPI) findAllByCondition(conditionFn func(Element) bool, el Elem
 }
 
 // Find first element by conditions.
+// ! Can't make it async. Async will return any randomly gotten element because goroutines are сhaotic.
+// ! This is not correct cause native DOM always searches element in the nearest subtree.
 func (a domSearchAPI) findOneByCondition(conditionFn func(Element) bool, el Element) (Element, error) {
 	if conditionFn(el) {
 		return el, nil

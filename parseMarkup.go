@@ -26,7 +26,10 @@ func parse(markup string) (*Element, error) {
 		return &Element{}, invalidRequestErr{Place: "markup is an empty string."}
 	}
 
-	parsedMarkup := parseMarkup(markup)
+	ch := make(chan string)
+
+	go tokenize(markup, ch)
+	parsedMarkup := parseMarkup(ch)
 
 	return parsedMarkup, nil
 }
@@ -37,21 +40,13 @@ func isSelfClosingTag(tag string) bool {
 }
 
 // Parse markup. Get DOM-like element tree.
-func parseMarkup(markup string) *Element {
+func parseMarkup(ch chan string) *Element {
 	var parentStack []Element
 	var root Element
 	var currEl *Element
-	var docType docType
-	tokens := tokenize(markup)
+	docType := html5
 
-	switch {
-	case strings.HasPrefix(strings.ToLower(tokens[0]), "<!doctype html public '-//w3c//dtd xhtml"):
-		docType = xhtml
-	default:
-		docType = html5
-	}
-
-	for _, token := range tokens {
+	for token := range ch {
 		switch {
 		case strings.HasPrefix(token, "</"): // tag is closing
 			if currEl != nil {
@@ -85,7 +80,16 @@ func parseMarkup(markup string) *Element {
 			currEl = nil
 
 			continue
-		case strings.HasPrefix(token, "<!"): // skip doctype and comments
+		case strings.HasPrefix(token, "<!"): // doctype and comments
+			if tokenLower := strings.ToLower(token); strings.HasPrefix(tokenLower, "<!doctype") {
+				switch {
+				case strings.HasPrefix(tokenLower, "<!doctype html public '-//w3c//dtd xhtml"):
+					docType = xhtml
+				default:
+					docType = html5
+				}
+			}
+
 			continue
 		case strings.HasPrefix(token, "<"): // new element
 			tag := parseTag(token)

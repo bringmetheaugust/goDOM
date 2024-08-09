@@ -47,7 +47,15 @@ var tokenizeExpect = []string{
 func Test_tokenize(t *testing.T) {
 	testFile, _ := os.ReadFile("./test/tokenize.html")
 	testFileStr := normalize(string(testFile))
-	v := tokenize(testFileStr)
 
-	assert.EqualValuesf(t, tokenizeExpect, v, "")
+	ch := make(chan string)
+	var tokens []string
+
+	go tokenize(testFileStr, ch)
+
+	for token := range ch {
+		tokens = append(tokens, token)
+	}
+
+	assert.EqualValuesf(t, tokenizeExpect, tokens, "")
 }

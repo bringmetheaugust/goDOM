@@ -3,8 +3,7 @@ package goDom
 import "strings"
 
 // Divide HTML to tokens. Each token is a HTML node.
-func tokenize(input string) []string {
-	var tokens []string
+func tokenize(input string, ch chan string) {
 	var currentToken strings.Builder
 	var isTrash bool
 
@@ -12,7 +11,7 @@ func tokenize(input string) []string {
 		switch input[i] {
 		case '<':
 			if currentToken.Len() > 0 && !isTrash {
-				tokens = append(tokens, currentToken.String())
+				ch <- currentToken.String()
 				currentToken.Reset()
 			}
 
@@ -22,7 +21,7 @@ func tokenize(input string) []string {
 
 			switch t := currentToken.String(); {
 			case strings.HasSuffix(t, "-->"), strings.HasPrefix(t, "<script"), strings.HasPrefix(t, "<style"): // comment is closing || script or style are opening
-				tokens = append(tokens, currentToken.String())
+				ch <- currentToken.String()
 				currentToken.Reset()
 
 				isTrash = !isTrash
@@ -32,10 +31,10 @@ func tokenize(input string) []string {
 				content := currentToken.String()[:len(currentToken.String())-8]
 
 				if content != "" {
-					tokens = append(tokens, content)
+					ch <- content
 				}
 
-				tokens = append(tokens, "</style>")
+				ch <- "</style>"
 				currentToken.Reset()
 
 				isTrash = false
@@ -45,17 +44,17 @@ func tokenize(input string) []string {
 				content := currentToken.String()[:len(currentToken.String())-9]
 
 				if content != "" {
-					tokens = append(tokens, content)
+					ch <- content
 				}
 
-				tokens = append(tokens, "</script>")
+				ch <- "</script>"
 				currentToken.Reset()
 
 				isTrash = false
 
 				continue
 			case !isTrash: // simple tag closing
-				tokens = append(tokens, currentToken.String())
+				ch <- currentToken.String()
 				currentToken.Reset()
 
 				continue
@@ -71,9 +70,5 @@ func tokenize(input string) []string {
 		}
 	}
 
-	if currentToken.Len() > 0 {
-		tokens = append(tokens, currentToken.String())
-	}
-
-	return tokens
+	close(ch)
 }
