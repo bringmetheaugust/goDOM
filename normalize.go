@@ -8,16 +8,22 @@ import (
 // Prepare HTML for parsing.
 // Remove endlines (\n), tabs (\t), empty lines.
 // Replace " to '.
-func normalize(markup string) string {
+// Uses as upstream.
+func normalize(markup string, ch chan string) {
 	scanner := bufio.NewScanner(strings.NewReader(markup))
-	var b strings.Builder
 
 	for scanner.Scan() {
 		str := scanner.Text()
-		b.WriteString(strings.TrimSpace(str))
-	}
-	markup = b.String()
-	markup = strings.ReplaceAll(markup, `"`, `'`) // cause string() shielding /"
+		fmtStr_0 := strings.TrimSpace(str)
 
-	return markup
+		if fmtStr_0 == "" {
+			continue
+		}
+
+		fmtStr_1 := strings.ReplaceAll(fmtStr_0, `"`, `'`)
+
+		ch <- fmtStr_1
+	}
+
+	close(ch)
 }

@@ -18,35 +18,20 @@ var selfClosingTags = []string{
 	"link", "meta", "param", "source", "track", "wbr",
 }
 
-// Prepare and parse markup. Get DOM-like element tree.
-func parse(markup string) (*Element, error) {
-	markup = normalize(markup)
-
-	if len(markup) == 0 {
-		return &Element{}, invalidRequestErr{Place: "markup is an empty string."}
-	}
-
-	ch := make(chan string)
-
-	go tokenize(markup, ch)
-	parsedMarkup := parseMarkup(ch)
-
-	return parsedMarkup, nil
-}
-
 // Check if tag is self-closing
 func isSelfClosingTag(tag string) bool {
 	return slices.Contains(selfClosingTags, tag)
 }
 
 // Parse markup. Get DOM-like element tree.
-func parseMarkup(ch chan string) *Element {
+// Uses as downstream.
+func parseMarkup(upStream chan string) *Element {
 	var parentStack []Element
 	var root Element
 	var currEl *Element
 	docType := html5
 
-	for token := range ch {
+	for token := range upStream {
 		switch {
 		case strings.HasPrefix(token, "</"): // tag is closing
 			if currEl != nil {
@@ -56,14 +41,14 @@ func parseMarkup(ch chan string) *Element {
 			tagName := token[2 : len(token)-1]
 
 			if len(parentStack) == 0 {
-				panic("Error during parsing markup: unmatched closing tag.")
+				panic("Error during parsing markup: unmatched closing tag. Please, report a bug.")
 			}
 
 			topFromParentStack := &parentStack[len(parentStack)-1]
 			parentStack = parentStack[:len(parentStack)-1]
 
 			if topFromParentStack.TagName != tagName {
-				panic("Error during parsing markup: mismatched closing tag.")
+				panic("Error during parsing markup: mismatched closing tag. Please, report a bug.")
 			}
 
 			if currEl != nil {
@@ -139,7 +124,7 @@ func parseMarkup(ch chan string) *Element {
 	}
 
 	if len(parentStack) != 0 {
-		panic("unmatched opening tags")
+		panic("unmatched opening tags. Please, report a bug.")
 	}
 
 	return &root

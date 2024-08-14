@@ -135,8 +135,8 @@ func Test_parseMarkup(t *testing.T) {
 
 	for _, testFilePath := range testFilePaths {
 		testFile, _ := os.ReadFile(testFilePath)
-		DOM, _ := parse(string(testFile))
-		mapedDOM := mapDomForTesting(DOM) // map Elemenet struct and remove some fields
+		DOM, _ := Create(testFile)
+		mapedDOM := mapDomForTesting(&DOM.root) // map Elemenet struct and remove some fields
 
 		assert.EqualValuesf(t, htmlExpect, mapedDOM, "")
 	}

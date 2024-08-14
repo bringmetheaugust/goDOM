@@ -46,14 +46,14 @@ var tokenizeExpect = []string{
 
 func Test_tokenize(t *testing.T) {
 	testFile, _ := os.ReadFile("./test/tokenize.html")
-	testFileStr := normalize(string(testFile))
-
-	ch := make(chan string)
+	chMarkupLine := make(chan string)
+	chTokens := make(chan string)
 	var tokens []string
 
-	go tokenize(testFileStr, ch)
+	go normalize(string(testFile), chMarkupLine)
+	go tokenize(chMarkupLine, chTokens)
 
-	for token := range ch {
+	for token := range chTokens {
 		tokens = append(tokens, token)
 	}
 

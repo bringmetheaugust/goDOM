@@ -28,4 +28,4 @@ jobs:
       run: go get
 
     - name: Test with the Go CLI
-      run: go test ./...
+      run: make tests

@@ -6,5 +6,8 @@ install:
 	@sh ./scripts/install.sh && ${OK_RESULT}
 
 tests:
-	@echo "run tests..."
+	@echo "Run tests..."
 	@go test ./... && ${OK_RESULT}
+
+lint:
+	@echo "Run lints..."

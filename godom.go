@@ -14,18 +14,19 @@
 
 package goDom
 
-// Parsing markup, create and return DOM tree and DOM API.
+// Prepare and parsing markup, create and return DOM tree and DOM API.
 //
 // Examples:
 //
 //	document, err := goDom.Create(bytes)
 //	if err != nil {return} // if markup is invalid
 func Create(data []byte) (*Document, error) {
-	root, err := parse(string(data))
+	chMarkupLine := make(chan string)
+	chTokens := make(chan string)
 
-	if err != nil {
-		return nil, err
-	}
+	go normalize(string(data), chMarkupLine)
+	go tokenize(chMarkupLine, chTokens)
+	root := parseMarkup(chTokens)
 
 	return createDocument(root), nil
 }

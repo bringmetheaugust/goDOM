@@ -7,4 +7,5 @@ else
 fi
 
 go fmt .
-go test ./...
+make tests
+make lint
