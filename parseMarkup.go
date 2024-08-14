@@ -25,7 +25,7 @@ func isSelfClosingTag(tag string) bool {
 
 // Parse markup. Get DOM-like element tree.
 // Uses as downstream.
-func parseMarkup(upStream chan string) *Element {
+func parseMarkup(upStream chan token) *Element {
 	var parentStack []Element
 	var root Element
 	var currEl *Element
@@ -33,22 +33,30 @@ func parseMarkup(upStream chan string) *Element {
 
 	for token := range upStream {
 		switch {
-		case strings.HasPrefix(token, "</"): // tag is closing
+		case token._type == token_content: // Element inner context
+			if currEl != nil {
+				currEl.TextContent += token.data
+
+				continue
+			}
+
+			parentStack[len(parentStack)-1].TextContent += token.data
+		case strings.HasPrefix(token.data, "</") && token._type == token_element: // tag is closing
 			if currEl != nil {
 				parentStack = append(parentStack, *currEl)
 			}
 
-			tagName := token[2 : len(token)-1]
+			tagName := token.data[2 : len(token.data)-1]
 
 			if len(parentStack) == 0 {
-				panic("Error during parsing markup: unmatched closing tag. Please, report a bug.")
+				panic("Error during parsing markup: unmatched closing tag. Please, report a bug." + token.data)
 			}
 
 			topFromParentStack := &parentStack[len(parentStack)-1]
 			parentStack = parentStack[:len(parentStack)-1]
 
 			if topFromParentStack.TagName != tagName {
-				panic("Error during parsing markup: mismatched closing tag. Please, report a bug.")
+				panic("Error during parsing markup: mismatched closing tag. Please, report a bug." + token.data)
 			}
 
 			if currEl != nil {
@@ -63,10 +71,8 @@ func parseMarkup(upStream chan string) *Element {
 			}
 
 			currEl = nil
-
-			continue
-		case strings.HasPrefix(token, "<!"): // doctype and comments
-			if tokenLower := strings.ToLower(token); strings.HasPrefix(tokenLower, "<!doctype") {
+		case strings.HasPrefix(token.data, "<!") && token._type == token_element: // doctype and comments
+			if tokenLower := strings.ToLower(token.data); strings.HasPrefix(tokenLower, "<!doctype") {
 				switch {
 				case strings.HasPrefix(tokenLower, "<!doctype html public '-//w3c//dtd xhtml"):
 					docType = xhtml
@@ -74,10 +80,8 @@ func parseMarkup(upStream chan string) *Element {
 					docType = html5
 				}
 			}
-
-			continue
-		case strings.HasPrefix(token, "<"): // new element
-			tag := parseTag(token)
+		case strings.HasPrefix(token.data, "<") && token._type == token_element: // new element
+			tag := parseTag(token.data)
 			newEl := Element{TagName: tag.name, Attributes: tag.attributes}
 
 			for k, v := range tag.attributes {
@@ -94,7 +98,7 @@ func parseMarkup(upStream chan string) *Element {
 				}
 			}
 
-			if strings.HasSuffix(token, "/>") || (docType == html5 && isSelfClosingTag(tag.name)) { // self-closing tags
+			if strings.HasSuffix(token.data, "/>") || (docType == html5 && isSelfClosingTag(tag.name)) { // self-closing tags
 				if currEl != nil {
 					currEl.Children = append(currEl.Children, newEl)
 				} else {
@@ -110,16 +114,14 @@ func parseMarkup(upStream chan string) *Element {
 
 				currEl = &newEl
 			}
-
-			continue
 		default: // Element inner context
 			if currEl != nil {
-				currEl.TextContent += token
+				currEl.TextContent += token.data
 
 				continue
 			}
 
-			parentStack[len(parentStack)-1].TextContent += token
+			parentStack[len(parentStack)-1].TextContent += token.data
 		}
 	}
 

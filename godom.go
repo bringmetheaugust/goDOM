@@ -22,7 +22,7 @@ package goDom
 //	if err != nil {return} // if markup is invalid
 func Create(data []byte) (*Document, error) {
 	chMarkupLine := make(chan string)
-	chTokens := make(chan string)
+	chTokens := make(chan token)
 
 	go normalize(string(data), chMarkupLine)
 	go tokenize(chMarkupLine, chTokens)
