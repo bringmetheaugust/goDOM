@@ -8,40 +8,40 @@ import (
 )
 
 var tokenizeExpect = []token{
-	{token_element, "<!DOCTYPE html>"},
-	{token_element, "<html lang='ua'>"},
-	{token_element, "<head>"},
-	{token_element, "<title>"},
-	{token_element, "Test tokenize"},
-	{token_element, "</title>"},
-	{token_element, "<link type='stylesheet' href='/LICENSE' />"},
-	{token_element, "<link type='xml/text' href='/README.md' />"},
-	{token_element, "<style id='wp-block-library-theme-inline-css'>"},
-	{token_content, "a > div { display: none !important; } .wp-block-search__button { border: 1px solid #ccc; padding: .375em .625em } :where(.wp-block-group.has-background) { padding: 1.25em 2.375em } .wp-block-separator.has-background:not(.is-style-wide):not(.is-style-dots) { height: 2px }"},
-	{token_element, "</style>"},
-	{token_element, "<style id='style_with_attribute'>"},
-	{token_content, ".lol { display: flex; }"},
-	{token_element, "</style>"},
-	{token_element, "</head>"},
-	{token_element, "<body>"},
-	{token_element, "<!-- <div>wtf, man???</div> -->"},
-	{token_element, "<ul>"},
-	{token_element, "<li>"},
-	{token_element, "li 1"},
-	{token_element, "</li>"},
-	{token_element, "<li>"},
-	{token_element, "li 2"},
-	{token_element, "<!-- <ul><li></li><li>блять..</li></ul> -->"},
-	{token_element, "</li>"},
-	{token_element, "</ul>"},
-	{token_element, "</body>"},
-	{token_element, "<script>"},
-	{token_content, "console.log(2 > 1 != 1 --)"},
-	{token_element, "</script>"},
-	{token_element, "<script id='script_with_attribute'>"},
-	{token_content, "console.log(1 < 2)"},
-	{token_element, "</script>"},
-	{token_element, "</html>"},
+	{_type: node_meta, data: "<!DOCTYPE html>"},
+	{_type: node_element, tag: parseTag("<html lang='ua'>")},
+	{_type: node_element, tag: parseTag("<head>")},
+	{_type: node_element, tag: parseTag("<title>")},
+	{_type: node_text, data: "Test tokenize"},
+	{_type: node_element, isClosing: true}, // </title>
+	{_type: node_element, tag: parseTag("<link type='stylesheet' href='/LICENSE' />")},
+	{_type: node_element, tag: parseTag("<link type='xml/text' href='/README.md' />")},
+	{_type: node_element, tag: parseTag("<style id='wp-block-library-theme-inline-css'>")},
+	{_type: node_text, data: "a > div { display: none !important; } .wp-block-search__button { border: 1px solid #ccc; padding: .375em .625em } :where(.wp-block-group.has-background) { padding: 1.25em 2.375em } .wp-block-separator.has-background:not(.is-style-wide):not(.is-style-dots) { height: 2px }"},
+	{_type: node_element, isClosing: true}, // </style>
+	{_type: node_element, tag: parseTag("<style id='style_with_attribute'>")},
+	{_type: node_text, data: ".lol { display: flex; }"},
+	{_type: node_element, isClosing: true}, // </style>
+	{_type: node_element, isClosing: true}, // </head>
+	{_type: node_element, tag: parseTag("<body>")},
+	{_type: node_comment, data: "<!-- <div>wtf, man???</div> -->"},
+	{_type: node_element, tag: parseTag("<ul>")},
+	{_type: node_element, tag: parseTag("<li>")},
+	{_type: node_text, data: "li 1"},
+	{_type: node_element, isClosing: true}, // </li>
+	{_type: node_element, tag: parseTag("<li>")},
+	{_type: node_text, data: "li 2"},
+	{_type: node_comment, data: "<!-- <ul><li></li><li>блять..</li></ul> -->"},
+	{_type: node_element, isClosing: true}, // </li>
+	{_type: node_element, isClosing: true}, // </ul>
+	{_type: node_element, isClosing: true}, // </body>
+	{_type: node_element, tag: parseTag("<script>")},
+	{_type: node_text, data: "console.log(2 > 1 != 1 --)"},
+	{_type: node_element, isClosing: true}, // </script>
+	{_type: node_element, tag: parseTag("<script id='script_with_attribute'>")},
+	{_type: node_text, data: "console.log(1 < 2)"},
+	{_type: node_element, isClosing: true}, // </script>
+	{_type: node_element, isClosing: true}, // </html>
 }
 
 func Test_tokenize(t *testing.T) {

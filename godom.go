@@ -26,7 +26,7 @@ func Create(data []byte) (*Document, error) {
 
 	go normalize(string(data), chMarkupLine)
 	go tokenize(chMarkupLine, chTokens)
-	root := parseMarkup(chTokens)
+	root := buildDOM(chTokens)
 
 	return createDocument(root), nil
 }

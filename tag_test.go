@@ -14,41 +14,61 @@ type tagTestPair struct {
 var tagTests = [...]tagTestPair{
 	{
 		"<div class='lol lil lop' hidden data-set='1 2 3' data_mid='wi-fi'>",
-		tag{name: "div", attributes: attributes{
-			"class":    "lol lil lop",
-			"hidden":   "",
-			"data-set": "1 2 3",
-			"data_mid": "wi-fi",
-		}},
+		tag{
+			name: "div",
+			attributes: attributes{
+				"class":    "lol lil lop",
+				"hidden":   "",
+				"data-set": "1 2 3",
+				"data_mid": "wi-fi",
+			},
+			selfClosing: false,
+		},
 	},
 	{
 		"<div class='lol lil lop' hidden data-set='1 2 3' data_mid='wi-fi'/>",
-		tag{name: "div", attributes: attributes{
-			"class":    "lol lil lop",
-			"hidden":   "",
-			"data-set": "1 2 3",
-			"data_mid": "wi-fi",
-		}},
+		tag{
+			name: "div",
+			attributes: attributes{
+				"class":    "lol lil lop",
+				"hidden":   "",
+				"data-set": "1 2 3",
+				"data_mid": "wi-fi",
+			},
+			selfClosing: true,
+		},
 	},
 	{
 		"<div class='lol'>",
-		tag{name: "div", attributes: attributes{
-			"class": "lol",
-		}},
+		tag{
+			name:        "div",
+			attributes:  attributes{"class": "lol"},
+			selfClosing: false,
+		},
 	},
 	{
 		"<div class='lol'/>",
-		tag{name: "div", attributes: attributes{
-			"class": "lol",
-		}},
+		tag{
+			name:        "div",
+			attributes:  attributes{"class": "lol"},
+			selfClosing: true,
+		},
 	},
 	{
 		"<div>",
-		tag{"div", nil},
+		tag{
+			name:        "div",
+			attributes:  nil,
+			selfClosing: false,
+		},
 	},
 	{
 		"<div/>",
-		tag{"div", nil},
+		tag{
+			name:        "div",
+			attributes:  nil,
+			selfClosing: true,
+		},
 	},
 }
 
