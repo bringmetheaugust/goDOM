@@ -1,10 +1,6 @@
-// Provide method to parse HTML and get browser-like DOM and DOM API.
+// Parse HTML and get browser-like DOM and DOM API.
 // Created only for reading DOM and getting information about elements.
 // Doesn't have mathods to mutate DOM.
-//
-// # Parsing HTML
-//
-// Parser get DOM tree of elements. It's simple mechanism without creating nodes.
 //
 // # DOM
 // Create browser-like DOM with popular element's fields and methods to get inforamtion about selected element.
@@ -14,19 +10,39 @@
 
 package goDom
 
-// Prepare and parsing markup, create and return DOM tree and DOM API.
+import (
+	"strings"
+
+	"golang.org/x/net/html"
+)
+
+// Parsing markup, create and return DOM tree with DOM API.
 //
 // Examples:
 //
 //	document, err := goDom.Create(bytes)
-//	if err != nil {return} // if markup is invalid
 func Create(data []byte) (*Document, error) {
-	chMarkupLine := make(chan string)
-	chTokens := make(chan token)
+	ch := make(chan html.Token)
+	t := html.NewTokenizer(strings.NewReader(string(data)))
 
-	go normalize(string(data), chMarkupLine)
-	go tokenize(chMarkupLine, chTokens)
-	root := buildDOM(chTokens)
+	go func() {
+		for {
+			tt := t.Next()
+
+			if tt == html.ErrorToken {
+				close(ch)
+				break
+			}
+
+			ch <- t.Token()
+		}
+	}()
+
+	root, err := buildDOM(ch)
+
+	if err != nil {
+		return nil, err
+	}
 
 	return createDocument(root), nil
 }

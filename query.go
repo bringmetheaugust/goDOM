@@ -100,8 +100,14 @@ func createQuery(qArr ...string) *query {
 		newQ.attributes = attributes{}
 
 		for _, m := range matchedAttrs {
-			newAttr := parseAttribute(m[1])
-			newQ.attributes[newAttr.name] = newAttr.value
+			res := strings.Split(m[1], "=")
+			var attrVal string
+
+			if len(res) > 1 {
+				attrVal = strings.ReplaceAll(res[1], "'", "")
+			}
+
+			newQ.attributes[res[0]] = attrVal
 		}
 	}
 
@@ -114,39 +120,3 @@ func matchedQueryParam(str string, q string) [][]string {
 
 	return reTag.FindAllStringSubmatch(q, -1)
 }
-
-// Create query struct.
-// With version of createQuery is not relevant cause have hard regExp and makes a lot of problems.
-// Deprecated.
-// func createQuery(qArr ...string) *query {
-// 	if len(qArr) == 0 {
-// 		return nil
-// 	}
-
-// 	var newQ query
-// 	a := matchedQueryParam(`^(?P<Tag>\w+)?(?:#(?P<ID>[\w\-]+))?(?P<Classes>(?:\.[\w\-]+)*)(?P<Attributes>(?:\[[^\]]+\])*)$`, qArr[0])
-
-// 	if len(a) > 0 {
-// 		r := a[0]
-
-// 		if s := r[1]; s != "" {
-// 			newQ.tagName = s
-// 		}
-// 		if s := r[2]; s != "" {
-// 			newQ.id = s
-// 		}
-// 		if s := r[3]; s != "" {
-// 			a := strings.Split(s, ".")[1:]
-// 			newQ.classList = a
-// 		}
-// 		if s := r[4]; s != "" {
-// 			attrS := parseAttribute(s[1 : len(s)-1])
-// 			newQ.attributes = attributes{}
-// 			newQ.attributes[attrS.name] = attrS.value
-// 		}
-// 	}
-
-// 	newQ.child = createQuery(qArr[1:]...)
-
-// 	return &newQ
-// }

@@ -3,14 +3,16 @@ package goDom
 import (
 	"slices"
 	"strings"
+
+	"golang.org/x/net/html"
 )
 
-type docType string
+// type docType string
 
-const (
-	html5 docType = "HTML5"
-	xhtml docType = "XHTML"
-)
+// const (
+// 	html5 docType = "HTML5"
+// 	xhtml docType = "XHTML"
+// )
 
 // self closing tags in HTML5
 var selfClosingTags = []string{
@@ -25,32 +27,37 @@ func isSelfClosingTag(tag string) bool {
 
 // Get DOM-like element tree.
 // Uses as downstream.
-func buildDOM(upStream chan token) *Element {
+func buildDOM(upStream chan html.Token) (*Element, error) {
+	// var docType docType
 	var parentStack []Element
 	var root Element
 	var currEl *Element
-	docType := html5
 
-	for token := range upStream {
+rootLopp:
+	for t := range upStream {
 		switch {
-		case token._type == node_meta:
-			if tokenLower := strings.ToLower(token.data); strings.HasPrefix(tokenLower, "<!doctype") {
-				switch {
-				case strings.HasPrefix(tokenLower, "<!doctype html public '-//w3c//dtd xhtml"):
-					docType = xhtml
-				default:
-					docType = html5
-				}
+		case t.Type == html.CommentToken:
+			continue rootLopp
+		case t.Type == html.DoctypeToken:
+			// switch tLow := strings.ToLower(t.Data); {
+			// case strings.HasPrefix(tLow, "<!doctype html public '-//w3c//dtd xhtml"):
+			// 	docType = xhtml
+			// default:
+			// 	docType = html5
+			// }
+		case t.Type == html.TextToken:
+			str := strings.TrimSpace(t.Data)
+
+			if str == "" {
+				continue rootLopp
 			}
-		case token._type == node_text:
+
 			if currEl != nil {
-				currEl.TextContent += token.data
-
-				continue
+				currEl.TextContent += str
+			} else {
+				parentStack[len(parentStack)-1].TextContent += str
 			}
-
-			parentStack[len(parentStack)-1].TextContent += token.data
-		case token._type == node_element && token.isClosing: // element closing
+		case t.Type == html.EndTagToken:
 			if currEl != nil {
 				parentStack = append(parentStack, *currEl)
 			}
@@ -59,13 +66,12 @@ func buildDOM(upStream chan token) *Element {
 				panic("Error during parsing markup: unmatched closing tag. Please, report a bug.")
 			}
 
-			// tagName := token.tag.name
 			topFromParentStack := &parentStack[len(parentStack)-1]
 			parentStack = parentStack[:len(parentStack)-1]
 
-			// if topFromParentStack.TagName != tagName {
-			// 	panic("Error during parsing markup: mismatched closing tag. Please, report a bug.")
-			// }
+			if topFromParentStack.TagName != t.Data {
+				panic("Error during parsing markup: mismatched closing tag. Please, report a bug.")
+			}
 
 			if currEl != nil {
 				topFromParentStack.TextContent = currEl.TextContent
@@ -79,28 +85,36 @@ func buildDOM(upStream chan token) *Element {
 			}
 
 			currEl = nil
-		case token._type == node_element && !token.isClosing: // new element
-			tag := token.tag
-			newEl := Element{TagName: tag.name, Attributes: tag.attributes}
+		default: // html.SelfClosingTagToken, html.StartTagToken
+			newEl := Element{TagName: t.Data}
 
-			for k, v := range tag.attributes {
-				switch {
-				case k == "class":
-					newEl.ClassName = v
-					newEl.ClassList = strings.Fields(v)
-				case k == "id":
-					newEl.Id = v
+			if len(t.Attr) > 0 {
+				newEl.Attributes = make(attributes)
+
+				for _, a := range t.Attr {
+					v := a.Val
+
+					switch a.Key {
+					case "class":
+						newEl.ClassName += v
+						newEl.ClassList = strings.Split(v, " ")
+					case "id":
+						newEl.Id = v
+					}
+
+					newEl.Attributes[a.Key] = v
 				}
 			}
 
-			if tag.selfClosing || (docType == html5 && isSelfClosingTag(tag.name)) { // self-closing tags
+			switch {
+			case t.Type == html.SelfClosingTagToken, t.Type == html.StartTagToken && isSelfClosingTag(t.Data):
 				if currEl != nil {
 					currEl.Children = append(currEl.Children, newEl)
 				} else {
 					topFromParentStack := &parentStack[len(parentStack)-1]
 					topFromParentStack.Children = append(topFromParentStack.Children, newEl)
 				}
-			} else { // tag ends
+			case t.Type == html.StartTagToken:
 				if currEl != nil {
 					parentStack = append(parentStack, *currEl)
 					currEl.Children = append(currEl.Children, newEl)
@@ -116,5 +130,5 @@ func buildDOM(upStream chan token) *Element {
 		panic("unmatched opening tags. Please, report a bug.")
 	}
 
-	return &root
+	return &root, nil
 }
