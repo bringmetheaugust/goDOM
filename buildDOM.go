@@ -7,18 +7,8 @@ import (
 	"golang.org/x/net/html"
 )
 
-// type docType string
-
-// const (
-// 	html5 docType = "HTML5"
-// 	xhtml docType = "XHTML"
-// )
-
 // self closing tags in HTML5
-var selfClosingTags = []string{
-	"area", "base", "br", "col", "embed", "hr", "img", "input",
-	"link", "meta", "param", "source", "track", "wbr",
-}
+var selfClosingTags = []string{"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"}
 
 // Check if tag is self-closing
 func isSelfClosingTag(tag string) bool {
@@ -27,10 +17,9 @@ func isSelfClosingTag(tag string) bool {
 
 // Get DOM-like element tree.
 // Uses as downstream.
-func buildDOM(upStream chan html.Token) (*Element, error) {
-	// var docType docType
+func buildDOM(upStream chan html.Token) (*Document, error) {
+	var doc Document
 	var parentStack []Element
-	var root Element
 	var currEl *Element
 
 rootLopp:
@@ -39,12 +28,12 @@ rootLopp:
 		case t.Type == html.CommentToken:
 			continue rootLopp
 		case t.Type == html.DoctypeToken:
-			// switch tLow := strings.ToLower(t.Data); {
-			// case strings.HasPrefix(tLow, "<!doctype html public '-//w3c//dtd xhtml"):
-			// 	docType = xhtml
-			// default:
-			// 	docType = html5
-			// }
+			switch tLow := strings.ToLower(t.Data); {
+			case strings.HasPrefix(tLow, "<!doctype html public '-//w3c//dtd xhtml"):
+				doc.Doctype = xhtml
+			default:
+				doc.Doctype = html5
+			}
 		case t.Type == html.TextToken:
 			str := strings.TrimSpace(t.Data)
 
@@ -81,7 +70,7 @@ rootLopp:
 				parent := &parentStack[len(parentStack)-1]
 				parent.Children = append(parent.Children, *topFromParentStack)
 			} else {
-				root = *topFromParentStack
+				doc.root = *topFromParentStack
 			}
 
 			currEl = nil
@@ -123,6 +112,24 @@ rootLopp:
 
 				currEl = &newEl
 			}
+
+			// *** Document fields
+			doc.All = append(doc.All, &newEl)
+
+			// TODO check if add count for optimization
+
+			switch tName := newEl.TagName; tName {
+			case "body":
+				doc.Body = &newEl
+			case "head":
+				doc.Head = &newEl
+			case "title":
+				doc.Title = &newEl.TextContent
+			case "a":
+				doc.Links = append(doc.Links, &newEl)
+			case "img":
+				doc.Images = append(doc.Images, &newEl)
+			}
 		}
 	}
 
@@ -130,5 +137,5 @@ rootLopp:
 		panic("unmatched opening tags. Please, report a bug.")
 	}
 
-	return &root, nil
+	return &doc, nil
 }

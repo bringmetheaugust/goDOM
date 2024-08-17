@@ -1,8 +1,22 @@
 package goDom
 
+type docType string
+
+const (
+	html5 docType = "HTML5"
+	xhtml docType = "XHTML"
+)
+
 // DOM tree with DOM API.
 type Document struct {
-	root Element
+	Title   *string
+	Body    *Element
+	Head    *Element
+	All     []*Element
+	Links   []*Element
+	Images  []*Element
+	Doctype docType
+	root    Element
 	domSearchAPI
 }
 
@@ -62,6 +76,23 @@ func (d Document) GetElementsByTagName(tag string) ([]Element, error) {
 }
 
 // Create new document.
-func createDocument(rootEl *Element) *Document {
-	return &Document{root: *rootEl}
-}
+// func (d Document) new(rootEl *Element) *Document {
+// 	doc := &Document{root: *rootEl}
+// 	head, headErr := rootEl.GetElementsByTagName("head")
+// 	body, bodyErr := rootEl.GetElementsByTagName("body")
+// 	title, titleErr := rootEl.QuerySelector("title")
+
+// 	if headErr == nil {
+// 		doc.Head = head[0]
+// 	}
+
+// 	if titleErr == nil {
+// 		doc.Title = title.TextContent
+// 	}
+
+// 	if bodyErr == nil {
+// 		doc.Body = body[0]
+// 	}
+
+// 	return doc
+// }

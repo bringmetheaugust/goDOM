@@ -11,3 +11,5 @@ tests:
 
 lint:
 	@echo "Run lints..."
+	@golangci-lint run
+	@gosec ./...

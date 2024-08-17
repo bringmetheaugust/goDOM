@@ -2,6 +2,10 @@
 // Created only for reading DOM and getting information about elements.
 // Doesn't have mathods to mutate DOM.
 //
+// # Parsing
+//
+// Uses net/html package to get HTML tokens.
+//
 // # DOM
 // Create browser-like DOM with popular element's fields and methods to get inforamtion about selected element.
 //
@@ -17,10 +21,12 @@ import (
 )
 
 // Parsing markup, create and return DOM tree with DOM API.
+// Return error if markup is invalid.
 //
 // Examples:
 //
 //	document, err := goDom.Create(bytes)
+//	if err != nil { // if markup is invalid
 func Create(data []byte) (*Document, error) {
 	ch := make(chan html.Token)
 	t := html.NewTokenizer(strings.NewReader(string(data)))
@@ -38,11 +44,11 @@ func Create(data []byte) (*Document, error) {
 		}
 	}()
 
-	root, err := buildDOM(ch)
+	d, err := buildDOM(ch)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return createDocument(root), nil
+	return d, nil
 }

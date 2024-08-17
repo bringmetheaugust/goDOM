@@ -27,5 +27,8 @@ jobs:
     - name: Install dependencies
       run: go get
 
-    - name: Test with the Go CLI
+    - name: Run tests
+      run: make tests
+
+    - name: Run lints
       run: make tests
