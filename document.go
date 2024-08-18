@@ -12,7 +12,6 @@ type Document struct {
 	Title   *string
 	Body    *Element
 	Head    *Element
-	All     []*Element
 	Links   []*Element
 	Images  []*Element
 	Doctype docType

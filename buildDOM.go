@@ -114,8 +114,6 @@ rootLopp:
 			}
 
 			// *** Document fields
-			doc.All = append(doc.All, &newEl)
-
 			// TODO check if add count for optimization
 
 			switch tName := newEl.TagName; tName {
