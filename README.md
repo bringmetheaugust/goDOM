@@ -91,13 +91,15 @@ func main() {
  * fields
 
     * [TagName](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName)
-    * `TextContent` element text
+    * [TextContent](https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent) element text
     * [Attributes](https://developer.mozilla.org/en-US/docs/Web/API/Element/attributes)
     * [Children](https://developer.mozilla.org/en-US/docs/Web/API/Element/children)
     * [ClassName](https://developer.mozilla.org/en-US/docs/Web/API/Element/className)
     * [ClassList](https://developer.mozilla.org/en-US/docs/Web/API/Element/classList)
     * [Id](https://developer.mozilla.org/en-US/docs/Web/API/Element/id)
     * [ParentElement](https://developer.mozilla.org/en-US/docs/Web/API/Node/parentElement)
+	* [NextElementSibling](https://developer.mozilla.org/en-US/docs/Web/API/Element/nextElementSibling)
+	* [PreviousElementSibling](https://developer.mozilla.org/en-US/docs/Web/API/Element/previousElementSibling)
 
 ## Development
 

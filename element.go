@@ -6,14 +6,16 @@ type children []Element
 
 // DOM element with fields and element's DOM API.
 type Element struct {
-	TagName       string
-	TextContent   string // only own text/content
-	Attributes    attributes
-	Children      children
-	ClassName     string
-	ClassList     classList
-	Id            string
-	ParentElement *Element
+	TagName                string
+	TextContent            string     // empty string if no content
+	Attributes             attributes // nil if no attributes
+	Children               children   // nil if no children
+	ClassName              string     // string with CSS classes. empty string if no classes
+	ClassList              classList  // nil if no classes
+	Id                     string     // id attribute
+	ParentElement          *Element   // nil if no parent element
+	NextElementSibling     *Element   // nil if no next element sibling
+	PreviousElementSibling *Element   // nil if no previous element sibling
 	domSearchAPI
 }
 

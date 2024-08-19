@@ -66,6 +66,7 @@ rootLopp:
 				topFromParentStack.TextContent = currEl.TextContent
 			}
 
+			// append Children
 			if len(parentStack) > 0 {
 				parent := &parentStack[len(parentStack)-1]
 				parent.Children = append(parent.Children, *topFromParentStack)
@@ -77,6 +78,7 @@ rootLopp:
 		default: // html.SelfClosingTagToken, html.StartTagToken
 			newEl := Element{TagName: t.Data}
 
+			// ClassName ClassList Id Attributes fields
 			if len(t.Attr) > 0 {
 				newEl.Attributes = make(attributes)
 
@@ -92,6 +94,17 @@ rootLopp:
 					}
 
 					newEl.Attributes[a.Key] = v
+				}
+			}
+
+			// PreviousElementSibling NextElementSibling fields
+			if len(parentStack) > 0 && currEl == nil {
+				parent := &parentStack[len(parentStack)-1]
+
+				if len(parent.Children) > 0 {
+					lastChild := &parent.Children[len(parent.Children)-1]
+					newEl.PreviousElementSibling = lastChild
+					lastChild.NextElementSibling = &newEl
 				}
 			}
 
@@ -113,20 +126,17 @@ rootLopp:
 				currEl = &newEl
 			}
 
-			// *** Document fields
-			// TODO check if add count for optimization
-
 			switch tName := newEl.TagName; tName {
+			case "a":
+				doc.Links = append(doc.Links, &newEl)
+			case "img":
+				doc.Images = append(doc.Images, &newEl)
 			case "body":
 				doc.Body = &newEl
 			case "head":
 				doc.Head = &newEl
 			case "title":
 				doc.Title = &newEl.TextContent
-			case "a":
-				doc.Links = append(doc.Links, &newEl)
-			case "img":
-				doc.Images = append(doc.Images, &newEl)
 			}
 		}
 	}
