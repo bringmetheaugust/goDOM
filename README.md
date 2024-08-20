@@ -61,8 +61,8 @@ func main() {
 
  * methods
 
-    * [QuerySelector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector) (doesn't support `*`, `>`, `+`, `~`, pseudo-elements, pseudo-classes)
-    * [QuerySelectorAll](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll) (doesn't support `*`, `>`, `+`, `~`, pseudo-elements, pseudo-classes)
+    * [QuerySelector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector) (doesn't support `>`, `+`, `~`, pseudo-elements, pseudo-classes)
+    * [QuerySelectorAll](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll) (doesn't support `>`, `+`, `~`, pseudo-elements, pseudo-classes)
     * [GetElementById](https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById)
     * [GetElementsByClassName](https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementsByClassName)
     * [GetElementsByTagName](https://developer.mozilla.org/en-US/docs/Web/API/Element/getElementsByTagName)
@@ -82,8 +82,8 @@ func main() {
 
     * [GetAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute)
     * [HasAttribute](https://developer.mozilla.org/en-US/docs/Web/API/Element/hasAttribute)
-    * [QuerySelector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector) (doesn't support `*`, `>`, `+`, `~`, pseudo-elements, pseudo-classes)
-    * [QuerySelectorAll](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll) (doesn't support `*`, `>`, `+`, `~`, pseudo-elements, pseudo-classes)
+    * [QuerySelector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector) (doesn't support `>`, `+`, `~`, pseudo-elements, pseudo-classes)
+    * [QuerySelectorAll](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll) (doesn't support `>`, `+`, `~`, pseudo-elements, pseudo-classes)
     * [GetElementById](https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById)
     * [GetElementsByClassName](https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementsByClassName)
     * [GetElementsByTagName](https://developer.mozilla.org/en-US/docs/Web/API/Element/getElementsByTagName)

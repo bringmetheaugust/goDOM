@@ -56,7 +56,7 @@ func (e Element) HasAttribute(attr string) bool {
 //	if err != nil {return} // if element doesn't exist inside element
 //	fmt.Println(element) // print finded element
 func (e Element) QuerySelector(queryStr string) (Element, error) {
-	return e._querySelector(queryStr, e)
+	return e.querySelector(queryStr, e)
 }
 
 // Find elements by query selector inside element. Exactly as yourElement.querySelectorAll() in browser DOM.
@@ -67,7 +67,7 @@ func (e Element) QuerySelector(queryStr string) (Element, error) {
 //	if err != nil {return} // if elements don't exist inside element
 //	fmt.Println(elements) // print finded elements
 func (e Element) QuerySelectorAll(queryStr string) ([]Element, error) {
-	return e._querySelectorAll(queryStr, e)
+	return e.querySelectorAll(queryStr, e)
 }
 
 // Find element by id inside element. Exactly as yourElement.getElementById() in browser DOM.
@@ -78,7 +78,7 @@ func (e Element) QuerySelectorAll(queryStr string) ([]Element, error) {
 //	if err != nil {return} // if element doesn't exist inside element
 //	fmt.Println(element) // print finded element
 func (e Element) GetElementById(id string) (Element, error) {
-	return e._getElementById(id, e)
+	return e.getElementById(id, e)
 }
 
 // Find elements by CSS class name inside element. Exactly as yourElement.getElementsByClassName() in browser DOM.
@@ -89,7 +89,7 @@ func (e Element) GetElementById(id string) (Element, error) {
 //	if err != nil {return} // if elements don't exist inside element
 //	fmt.Println(elements) // print finded elements
 func (e Element) GetElementsByClassName(class string) ([]Element, error) {
-	return e._getElementsByClassName(class, e)
+	return e.getElementsByClassName(class, e)
 }
 
 // Find elements by tag name inside element. Exactly as yourElement.getElementsByTagName() in browser DOM.
@@ -100,5 +100,5 @@ func (e Element) GetElementsByClassName(class string) ([]Element, error) {
 //	if err != nil {return} // if elements don't exist inside element
 //	fmt.Println(elements) // print finded elements
 func (e Element) GetElementsByTagName(tag string) ([]Element, error) {
-	return e._getElementsByTagName(tag, e)
+	return e.getElementsByTagName(tag, e)
 }
