@@ -9,17 +9,51 @@ import (
 // DOM API search methods.
 type domSearchAPI struct{}
 
-func (a domSearchAPI) _querySelector(queryStr string, el Element) (Element, error) {
-	q, err := parseQuery(queryStr)
+func (api domSearchAPI) querySelector(queryStr string, el Element) (Element, error) {
+	pq, err := parseQuery(queryStr)
 
 	if err != nil {
 		return Element{}, err
 	}
 
-	return a.findElementByQuery(*q, el)
+	// Find one (first) element which matches all levels query.
+	var findElementByQuery func(query, Element) (Element, error)
+	findElementByQuery = func(q query, el Element) (Element, error) {
+		var match *Element
+		conditionFn := func(element Element) bool {
+			return matchesQuery(q, element)
+		}
+		res, err := findOneByCondition(conditionFn, el)
+
+		if err != nil {
+			return Element{}, err
+		}
+
+		if q.child == nil {
+			return res, nil
+		}
+
+		for _, el := range res.Children {
+			e, err := findElementByQuery(*q.child, el)
+
+			if err != nil {
+				continue
+			}
+
+			match = &e
+		}
+
+		if match == nil {
+			return Element{}, notFoundErr{Params: queryStr}
+		}
+
+		return *match, nil
+	}
+
+	return findElementByQuery(*pq, el)
 }
 
-func (a domSearchAPI) _querySelectorAll(queryStr string, el Element) ([]Element, error) {
+func (api domSearchAPI) querySelectorAll(queryStr string, el Element) ([]Element, error) {
 	queries, err := parseQueries(queryStr)
 
 	if err != nil {
@@ -28,8 +62,43 @@ func (a domSearchAPI) _querySelectorAll(queryStr string, el Element) ([]Element,
 
 	var matches []Element
 
+	// Find elements which matches all levels query.
+	var findElementsByQuery func(query, Element) ([]Element, error)
+	findElementsByQuery = func(q query, el Element) ([]Element, error) {
+		var matches []Element
+
+		// find elements which match first query level
+		conditionFn := func(element Element) bool {
+			return matchesQuery(q, element)
+		}
+		res, err := findAllByCondition(conditionFn, el)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if q.child == nil {
+			return res, nil
+		}
+
+		for _, match := range res {
+			for _, e := range match.Children {
+				elems, err := findElementsByQuery(*q.child, e)
+
+				if err != nil {
+					continue
+				}
+
+				matches = append(matches, elems...)
+			}
+		}
+
+		return matches, nil
+	}
+
+	// paired queries
 	for _, q := range queries {
-		res, err := a.findElementsByQuery(q, el)
+		res, err := findElementsByQuery(q, el)
 
 		if err != nil {
 			continue
@@ -45,31 +114,38 @@ func (a domSearchAPI) _querySelectorAll(queryStr string, el Element) ([]Element,
 	return matches, nil
 }
 
-func (a domSearchAPI) _getElementById(id string, el Element) (Element, error) {
-	res, err := a.findByField("Id", id, el)
-
-	if err != nil {
-		return Element{}, err
+func (api domSearchAPI) getElementById(id string, el Element) (Element, error) {
+	conditionFn := func(element Element) bool {
+		return hasField[string]("Id", id, element)
 	}
 
-	return res[0], nil
+	return findOneByCondition(conditionFn, el)
 }
 
-func (a domSearchAPI) _getElementsByClassName(class string, el Element) ([]Element, error) {
+func (api domSearchAPI) getElementsByClassName(class string, el Element) ([]Element, error) {
 	conditionFn := func(el Element) bool {
 		return slices.Contains(el.ClassList, class)
 	}
 
-	return a.findAllByCondition(conditionFn, el)
+	return findAllByCondition(conditionFn, el)
 }
 
-func (a domSearchAPI) _getElementsByTagName(tag string, el Element) ([]Element, error) {
-	return a.findByField("TagName", tag, el)
+func (api domSearchAPI) getElementsByTagName(tag string, el Element) ([]Element, error) {
+	conditionFn := func(element Element) bool {
+		return hasField[string]("TagName", tag, element)
+	}
+
+	return findAllByCondition(conditionFn, el)
 }
 
 // Check if element matches one level query.
-func (a domSearchAPI) elementMatchesQuery(q query) func(Element) bool {
-	conditionFn := func(el Element) bool {
+func matchesQuery(q query, el Element) bool {
+	if o := q.operator; o != "" {
+		switch o {
+		case query_operator_all:
+			return true
+		}
+	} else {
 		if q.tagName != "" && el.TagName != q.tagName {
 			return false
 		}
@@ -93,75 +169,24 @@ func (a domSearchAPI) elementMatchesQuery(q query) func(Element) bool {
 				return false
 			}
 		}
-
-		return true
 	}
 
-	return conditionFn
+	return true
 }
 
-// Find one (first) element which matches all levels query.
-func (a domSearchAPI) findElementByQuery(q query, el Element) (Element, error) {
-	conditionFn := a.elementMatchesQuery(q)
-	res, err := a.findOneByCondition(conditionFn, el)
+// Check if element has field with value. Only for cases when field's value is string.
+func hasField[V string | int](field string, val V, el Element) bool {
+	fieldValue, err := tools.GetFieldValue(&el, field)
 
 	if err != nil {
-		return Element{}, err
+		return false
 	}
 
-	if q.child == nil {
-		return res, nil
-	}
-
-	return a.findElementByQuery(*q.child, res)
-}
-
-// Find elements which matches all levels query.
-func (a domSearchAPI) findElementsByQuery(q query, el Element) ([]Element, error) {
-	var matches []Element
-
-	// find elements which match first query level
-	conditionFn := a.elementMatchesQuery(q)
-	res, err := a.findAllByCondition(conditionFn, el)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if q.child == nil {
-		return res, nil
-	}
-
-	for _, match := range res {
-		res, err := a.findElementsByQuery(*q.child, match)
-
-		if err != nil {
-			continue
-		}
-
-		matches = append(matches, res...)
-	}
-
-	return matches, nil
-}
-
-// FInd elements by field. Only for cases when field's value is string.
-func (a domSearchAPI) findByField(field string, val string, el Element) ([]Element, error) {
-	conditionFn := func(el Element) bool {
-		fieldValue, err := tools.GetFieldValue(&el, field)
-
-		if err != nil {
-			return false
-		}
-
-		return fieldValue == val
-	}
-
-	return a.findAllByCondition(conditionFn, el)
+	return fieldValue == val
 }
 
 // Find elements by conditions.
-func (a domSearchAPI) findAllByCondition(conditionFn func(Element) bool, el Element) ([]Element, error) {
+func findAllByCondition(conditionFn func(Element) bool, el Element) ([]Element, error) {
 	var matches []Element
 
 	if conditionFn(el) {
@@ -169,7 +194,7 @@ func (a domSearchAPI) findAllByCondition(conditionFn func(Element) bool, el Elem
 	}
 
 	for _, child := range el.Children {
-		res, err := a.findAllByCondition(conditionFn, child)
+		res, err := findAllByCondition(conditionFn, child)
 
 		if err == nil {
 			matches = append(matches, res...)
@@ -184,15 +209,13 @@ func (a domSearchAPI) findAllByCondition(conditionFn func(Element) bool, el Elem
 }
 
 // Find first element by conditions.
-// ! Can't make it async. Async will return any randomly gotten element because goroutines are сhaotic.
-// ! This is not correct cause native DOM always searches element in the nearest subtree.
-func (a domSearchAPI) findOneByCondition(conditionFn func(Element) bool, el Element) (Element, error) {
+func findOneByCondition(conditionFn func(Element) bool, el Element) (Element, error) {
 	if conditionFn(el) {
 		return el, nil
 	}
 
 	for _, child := range el.Children {
-		res, err := a.findOneByCondition(conditionFn, child)
+		res, err := findOneByCondition(conditionFn, child)
 
 		if err != nil {
 			continue
@@ -203,17 +226,3 @@ func (a domSearchAPI) findOneByCondition(conditionFn func(Element) bool, el Elem
 
 	return Element{}, notFoundErr{}
 }
-
-// Find elements by attribute.
-// Temporary deprecated.
-// func (a domSearchAPI) findByAttribute(attr string, val string, el Element) ([]Element, error) {
-// 	conditionFn := func(el Element) bool {
-// 		if v, ok := el.Attributes[attr]; ok && v == val {
-// 			return true
-// 		}
-
-// 		return false
-// 	}
-
-// 	return a.findAllByCondition(conditionFn, el)
-// }

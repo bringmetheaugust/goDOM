@@ -1,6 +1,7 @@
 package goDom
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 )
@@ -10,9 +11,18 @@ type query struct {
 	id      string
 	classList
 	attributes
-	child *query // next level query (ex in ".lol .lal" .lal is a next level query)
+	operator selectorOperator // if query is selector operator. "" if not
+	child    *query           // next level query (ex in ".lol .lal" .lal is a next level query)
 }
 type queries []query
+type selectorOperator string
+
+const (
+	query_operator_all    selectorOperator = "*"
+	query_operator_parent selectorOperator = ">"
+	query_operator_after  selectorOperator = "+"
+	query_operator_hz     selectorOperator = "~"
+)
 
 // Parse and get slice of queries.
 // This need in case then query has multiple separated selectors (ex for QuerySelectorAll(".lol, #hell, div")).
@@ -62,40 +72,39 @@ func createQuery(qArr ...string) *query {
 
 	q := qArr[0]
 	var newQ query
+	var matchedTag, matchedClasses, matchedId, matchedAttrs [][]string
+	var classList classList
+
+	// if selector operator
+	switch o := selectorOperator(q); o {
+	case query_operator_all:
+		newQ.operator = selectorOperator(o)
+		goto nextQuery
+	case query_operator_parent, query_operator_after, query_operator_hz:
+		panic(fmt.Sprintf("%v operator is not jet supported.", o))
+	}
 
 	// * get tagName
-
-	matchedTag := matchedQueryParam(`^(\w+)(?:\.|\[|#|$)`, q)
-
+	matchedTag = matchedQueryParam(`^(\w+)(?:\.|\[|#|$)`, q)
 	if len(matchedTag) > 0 {
 		newQ.tagName = matchedTag[0][1]
 	}
 
 	// * get classes
-
-	var classList classList
-	matchedClasses := matchedQueryParam(`(?:\.)([\w-]+)`, q)
-
+	matchedClasses = matchedQueryParam(`(?:\.)([\w-]+)`, q)
 	for _, class := range matchedClasses {
 		classList = append(classList, class[1])
 	}
-
 	newQ.classList = classList
 
 	// * get id
-
-	matchedId := matchedQueryParam(`(?:#)([\w-]+)`, q)
-
+	matchedId = matchedQueryParam(`(?:#)([\w-]+)`, q)
 	if len(matchedId) > 0 {
 		newQ.id = matchedId[0][1]
 	}
 
-	newQ.child = createQuery(qArr[1:]...)
-
 	// * get attributes
-
-	matchedAttrs := matchedQueryParam(`\[(\w+=[\'"][^\'"]*[\'"]|[\w-]+)\]`, q)
-
+	matchedAttrs = matchedQueryParam(`\[(\w+=[\'"][^\'"]*[\'"]|[\w-]+)\]`, q)
 	if len(matchedAttrs) > 0 {
 		newQ.attributes = attributes{}
 
@@ -110,6 +119,9 @@ func createQuery(qArr ...string) *query {
 			newQ.attributes[res[0]] = attrVal
 		}
 	}
+
+nextQuery:
+	newQ.child = createQuery(qArr[1:]...)
 
 	return &newQ
 }

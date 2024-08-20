@@ -27,7 +27,7 @@ type Document struct {
 //	if err != nil {return} // if element doesn't exist in DOM tree
 //	fmt.Println(element) // print finded element
 func (d Document) QuerySelector(queryStr string) (Element, error) {
-	return d._querySelector(queryStr, d.root)
+	return d.querySelector(queryStr, d.root)
 }
 
 // Find elements by query selector. Exactly as document.querySelectorAll() in browser DOM.
@@ -38,7 +38,7 @@ func (d Document) QuerySelector(queryStr string) (Element, error) {
 //	if err != nil {return} // if elements don't exist in DOM tree
 //	fmt.Println(elements) // print finded elements
 func (d Document) QuerySelectorAll(queryStr string) ([]Element, error) {
-	return d._querySelectorAll(queryStr, d.root)
+	return d.querySelectorAll(queryStr, d.root)
 }
 
 // Find element by id. Exactly as document.getElementById() in browser DOM.
@@ -49,7 +49,7 @@ func (d Document) QuerySelectorAll(queryStr string) ([]Element, error) {
 //	if err != nil {return} // if element doesn't exist in DOM tree
 //	fmt.Println(element) // print finded element
 func (d Document) GetElementById(id string) (Element, error) {
-	return d._getElementById(id, d.root)
+	return d.getElementById(id, d.root)
 }
 
 // Find elements by CSS class name. Exactly as document.getElementsByClassName() in browser DOM.
@@ -60,7 +60,7 @@ func (d Document) GetElementById(id string) (Element, error) {
 //	if err != nil {return} // if elements don't exist in DOM tree
 //	fmt.Println(elements) // print finded elements
 func (d Document) GetElementsByClassName(class string) ([]Element, error) {
-	return d._getElementsByClassName(class, d.root)
+	return d.getElementsByClassName(class, d.root)
 }
 
 // Find elements by tag name. Exactly as document.getElementsByTagName() in browser DOM.
@@ -71,27 +71,5 @@ func (d Document) GetElementsByClassName(class string) ([]Element, error) {
 //	if err != nil {return} // if elements don't exist in DOM tree
 //	fmt.Println(elements) // print finded elements
 func (d Document) GetElementsByTagName(tag string) ([]Element, error) {
-	return d._getElementsByTagName(tag, d.root)
+	return d.getElementsByTagName(tag, d.root)
 }
-
-// Create new document.
-// func (d Document) new(rootEl *Element) *Document {
-// 	doc := &Document{root: *rootEl}
-// 	head, headErr := rootEl.GetElementsByTagName("head")
-// 	body, bodyErr := rootEl.GetElementsByTagName("body")
-// 	title, titleErr := rootEl.QuerySelector("title")
-
-// 	if headErr == nil {
-// 		doc.Head = head[0]
-// 	}
-
-// 	if titleErr == nil {
-// 		doc.Title = title.TextContent
-// 	}
-
-// 	if bodyErr == nil {
-// 		doc.Body = body[0]
-// 	}
-
-// 	return doc
-// }

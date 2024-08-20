@@ -2,25 +2,24 @@ package goDom
 
 import "testing"
 
-type elementTestPair struct {
+type elementTestPair[E string | bool] struct {
 	value     string
-	expect    any
+	expect    E
 	expectErr bool
 }
 
-var getAttributeTests = []elementTestPair{
+var getAttributeTests = []elementTestPair[string]{
 	{"href", "http://pizdets.com", false},
 	{"hidden", "", false},
 	{"magic", "", true},
 	{"", "", true},
 }
-var hasAttributeTests = []elementTestPair{
+var hasAttributeTests = []elementTestPair[bool]{
 	{value: "href", expect: true},
 	{value: "hidden", expect: true},
 	{value: "magic", expect: false},
 	{value: "", expect: false},
 }
-
 var mockElement = Element{
 	Attributes: attributes{
 		"href":   "http://pizdets.com",
