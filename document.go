@@ -15,7 +15,7 @@ type Document struct {
 	Links   []*Element
 	Images  []*Element
 	Doctype docType
-	root    Element
+	root    *Element
 	domSearchAPI
 }
 
@@ -26,7 +26,7 @@ type Document struct {
 //	element, err := document.QuerySelector("div#lal .lol")
 //	if err != nil {return} // if element doesn't exist in DOM tree
 //	fmt.Println(element) // print finded element
-func (d Document) QuerySelector(queryStr string) (Element, error) {
+func (d *Document) QuerySelector(queryStr string) (*Element, error) {
 	return d.querySelector(queryStr, d.root)
 }
 
@@ -37,7 +37,7 @@ func (d Document) QuerySelector(queryStr string) (Element, error) {
 //	elements, err := document.QuerySelector("#my_lol .lolipop")
 //	if err != nil {return} // if elements don't exist in DOM tree
 //	fmt.Println(elements) // print finded elements
-func (d Document) QuerySelectorAll(queryStr string) ([]Element, error) {
+func (d *Document) QuerySelectorAll(queryStr string) ([]*Element, error) {
 	return d.querySelectorAll(queryStr, d.root)
 }
 
@@ -48,7 +48,7 @@ func (d Document) QuerySelectorAll(queryStr string) ([]Element, error) {
 //	element, err := document.GetElementById("piu")
 //	if err != nil {return} // if element doesn't exist in DOM tree
 //	fmt.Println(element) // print finded element
-func (d Document) GetElementById(id string) (Element, error) {
+func (d *Document) GetElementById(id string) (*Element, error) {
 	return d.getElementById(id, d.root)
 }
 
@@ -59,7 +59,7 @@ func (d Document) GetElementById(id string) (Element, error) {
 //	elements, err := document.GetElementsByClassName(".lolipop")
 //	if err != nil {return} // if elements don't exist in DOM tree
 //	fmt.Println(elements) // print finded elements
-func (d Document) GetElementsByClassName(class string) ([]Element, error) {
+func (d *Document) GetElementsByClassName(class string) ([]*Element, error) {
 	return d.getElementsByClassName(class, d.root)
 }
 
@@ -70,6 +70,6 @@ func (d Document) GetElementsByClassName(class string) ([]Element, error) {
 //	elements, err := document.GetElementsByTagName("li")
 //	if err != nil {return} // if elements don't exist in DOM tree
 //	fmt.Println(elements) // print finded elements
-func (d Document) GetElementsByTagName(tag string) ([]Element, error) {
+func (d *Document) GetElementsByTagName(tag string) ([]*Element, error) {
 	return d.getElementsByTagName(tag, d.root)
 }

@@ -2,20 +2,20 @@ package goDom
 
 type attributes map[string]string
 type classList []string
-type children []Element
+type children []*Element
 
 // DOM element with fields and element's DOM API.
 type Element struct {
 	TagName                string
-	TextContent            string     // empty string if no content
-	Attributes             attributes // nil if no attributes
-	Children               children   // nil if no children
-	ClassName              string     // string with CSS classes. empty string if no classes
-	ClassList              classList  // nil if no classes
-	Id                     string     // id attribute
-	ParentElement          *Element   // nil if no parent element
-	NextElementSibling     *Element   // nil if no next element sibling
-	PreviousElementSibling *Element   // nil if no previous element sibling
+	TextContent            string
+	Attributes             attributes
+	Children               children
+	ClassName              string
+	ClassList              classList
+	Id                     string
+	ParentElement          *Element
+	NextElementSibling     *Element
+	PreviousElementSibling *Element
 	domSearchAPI
 }
 
@@ -27,7 +27,7 @@ type Element struct {
 //	hrefAttr, err := el.GetAttribute("href")
 //	if err != nil {return} // attribute doesn't exist
 //	fmt.Println(hrefAttr) // print existed attribute value
-func (e Element) GetAttribute(attr string) (string, error) {
+func (e *Element) GetAttribute(attr string) (string, error) {
 	if val, ok := e.Attributes[attr]; ok {
 		return val, nil
 	}
@@ -42,7 +42,7 @@ func (e Element) GetAttribute(attr string) (string, error) {
 //	el, _ := document.GetElementById("lol")
 //	hasHrefAttr := el.HasAttribute("href")
 //	fmt.Println(hasHrefAttr) // print true if attribute existed
-func (e Element) HasAttribute(attr string) bool {
+func (e *Element) HasAttribute(attr string) bool {
 	_, err := e.GetAttribute(attr)
 
 	return err == nil
@@ -55,7 +55,7 @@ func (e Element) HasAttribute(attr string) bool {
 //	element, err := yourElement.QuerySelector("div#lal .lol")
 //	if err != nil {return} // if element doesn't exist inside element
 //	fmt.Println(element) // print finded element
-func (e Element) QuerySelector(queryStr string) (Element, error) {
+func (e *Element) QuerySelector(queryStr string) (*Element, error) {
 	return e.querySelector(queryStr, e)
 }
 
@@ -66,7 +66,7 @@ func (e Element) QuerySelector(queryStr string) (Element, error) {
 //	elements, err := yourElement.QuerySelector("#my_lol .lolipop")
 //	if err != nil {return} // if elements don't exist inside element
 //	fmt.Println(elements) // print finded elements
-func (e Element) QuerySelectorAll(queryStr string) ([]Element, error) {
+func (e *Element) QuerySelectorAll(queryStr string) ([]*Element, error) {
 	return e.querySelectorAll(queryStr, e)
 }
 
@@ -77,7 +77,7 @@ func (e Element) QuerySelectorAll(queryStr string) ([]Element, error) {
 //	element, err := yourElement.GetElementById("piu")
 //	if err != nil {return} // if element doesn't exist inside element
 //	fmt.Println(element) // print finded element
-func (e Element) GetElementById(id string) (Element, error) {
+func (e *Element) GetElementById(id string) (*Element, error) {
 	return e.getElementById(id, e)
 }
 
@@ -88,7 +88,7 @@ func (e Element) GetElementById(id string) (Element, error) {
 //	elements, err := yourElement.GetElementsByClassName(".lolipop")
 //	if err != nil {return} // if elements don't exist inside element
 //	fmt.Println(elements) // print finded elements
-func (e Element) GetElementsByClassName(class string) ([]Element, error) {
+func (e *Element) GetElementsByClassName(class string) ([]*Element, error) {
 	return e.getElementsByClassName(class, e)
 }
 
@@ -99,6 +99,6 @@ func (e Element) GetElementsByClassName(class string) ([]Element, error) {
 //	elements, err := yourElement.GetElementsByTagName("li")
 //	if err != nil {return} // if elements don't exist inside element
 //	fmt.Println(elements) // print finded elements
-func (e Element) GetElementsByTagName(tag string) ([]Element, error) {
+func (e *Element) GetElementsByTagName(tag string) ([]*Element, error) {
 	return e.getElementsByTagName(tag, e)
 }
