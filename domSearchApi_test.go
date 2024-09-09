@@ -8,7 +8,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type documentTestPair[E Element | children] struct {
+type elementP *Element
+type elementList []*Element
+
+type documentTestPair[E elementP | elementList] struct {
 	description string
 	params      string
 	expect      E
@@ -19,17 +22,17 @@ var testFile, _ = os.ReadFile("./test/search.html")
 var document, _ = Create(testFile)
 var elementIgnoredTestFields = []string{"ParentElement", "Children", "PreviousElementSibling", "NextElementSibling", "domSearchAPI"}
 
-var querySelectorTestPair = []documentTestPair[Element]{
+var querySelectorTestPair = []documentTestPair[elementP]{
 	{
 		description: "Not existed element.",
 		params:      ".lal",
-		expect:      Element{},
+		expect:      nil,
 		expectErr:   true,
 	},
 	{
 		description: "Id query.",
 		params:      "#hh",
-		expect: Element{
+		expect: &Element{
 			TagName:     "h4",
 			Id:          "hh",
 			TextContent: "nav item 2",
@@ -40,7 +43,7 @@ var querySelectorTestPair = []documentTestPair[Element]{
 	{
 		description: "Attribute with value query.",
 		params:      "li[data-pull='weee']",
-		expect: Element{
+		expect: &Element{
 			TagName:     "li",
 			Id:          "",
 			TextContent: "nav item 1",
@@ -53,7 +56,7 @@ var querySelectorTestPair = []documentTestPair[Element]{
 	{
 		description: "Multistage query.",
 		params:      "#nav_list ul#sub_item_list span",
-		expect: Element{
+		expect: &Element{
 			TagName:     "span",
 			TextContent: "top",
 			Attributes:  attributes{"class": "top"},
@@ -65,7 +68,7 @@ var querySelectorTestPair = []documentTestPair[Element]{
 	{
 		description: "Multistage query.",
 		params:      "#nav_list ul#sub_item_list",
-		expect: Element{
+		expect: &Element{
 			TagName:     "ul",
 			Id:          "sub_item_list",
 			TextContent: "",
@@ -76,7 +79,7 @@ var querySelectorTestPair = []documentTestPair[Element]{
 	{
 		description: "Multistage query.",
 		params:      ".bee ul",
-		expect: Element{
+		expect: &Element{
 			TagName:     "ul",
 			ClassName:   "bee-bee",
 			ClassList:   classList{"bee-bee"},
@@ -88,7 +91,7 @@ var querySelectorTestPair = []documentTestPair[Element]{
 	},
 }
 
-var querySelectorAllTestPair = []documentTestPair[children]{
+var querySelectorAllTestPair = []documentTestPair[elementList]{
 	{
 		description: "Not existed elements.",
 		params:      ".lal",
@@ -98,7 +101,7 @@ var querySelectorAllTestPair = []documentTestPair[children]{
 	{
 		description: "Class query.",
 		params:      ".yellow",
-		expect: []Element{
+		expect: []*Element{
 			{
 				TagName:     "li",
 				TextContent: "nav item 4",
@@ -119,7 +122,7 @@ var querySelectorAllTestPair = []documentTestPair[children]{
 	{
 		description: "Attribute without value query.",
 		params:      "button[disabled]",
-		expect: []Element{
+		expect: []*Element{
 			{
 				TagName:     "button",
 				TextContent: "save",
@@ -136,7 +139,7 @@ var querySelectorAllTestPair = []documentTestPair[children]{
 	{
 		description: "Multistage query.",
 		params:      "footer .button button",
-		expect: []Element{
+		expect: []*Element{
 			{
 				TagName:     "button",
 				TextContent: "delete",
@@ -153,7 +156,7 @@ var querySelectorAllTestPair = []documentTestPair[children]{
 	{
 		description: "Multi selectors.",
 		params:      ".homi, button[disabled], h2",
-		expect: []Element{
+		expect: []*Element{
 			{
 				TagName:     "address",
 				TextContent: "home 1",
@@ -192,7 +195,7 @@ var querySelectorAllTestPair = []documentTestPair[children]{
 	{
 		description: "Multi selector with query_operator_all operator.",
 		params:      "#sub_item_list *",
-		expect: []Element{
+		expect: []*Element{
 			{
 				TagName:     "li",
 				TextContent: "sub item 1",
@@ -225,21 +228,21 @@ var querySelectorAllTestPair = []documentTestPair[children]{
 	},
 }
 
-var getElementByIdTestPair = []documentTestPair[Element]{
+var getElementByIdTestPair = []documentTestPair[elementP]{
 	{
 		description: "Not existed element.",
 		params:      "lal",
-		expect:      Element{},
+		expect:      nil,
 		expectErr:   true,
 	},
 	{
 		params:    "hh ll",
-		expect:    Element{},
+		expect:    nil,
 		expectErr: true,
 	},
 	{
 		params: "hh",
-		expect: Element{
+		expect: &Element{
 			TagName:     "h4",
 			Id:          "hh",
 			TextContent: "nav item 2",
@@ -249,7 +252,7 @@ var getElementByIdTestPair = []documentTestPair[Element]{
 	},
 }
 
-var getElementsByClassNameTestPair = []documentTestPair[children]{
+var getElementsByClassNameTestPair = []documentTestPair[elementList]{
 	{
 		params:    "hommo",
 		expect:    nil,
@@ -257,7 +260,7 @@ var getElementsByClassNameTestPair = []documentTestPair[children]{
 	},
 	{
 		params: "homi",
-		expect: children{
+		expect: []*Element{
 			{
 				TagName:     "address",
 				TextContent: "home 1",
@@ -277,7 +280,7 @@ var getElementsByClassNameTestPair = []documentTestPair[children]{
 	},
 }
 
-var getElementsByTagNameTestPair = []documentTestPair[children]{
+var getElementsByTagNameTestPair = []documentTestPair[elementList]{
 	{
 		params:    "lii",
 		expect:    nil,
@@ -285,7 +288,7 @@ var getElementsByTagNameTestPair = []documentTestPair[children]{
 	},
 	{
 		params: "img",
-		expect: children{
+		expect: []*Element{
 			{
 				TagName:    "img",
 				Attributes: attributes{"src": "http://zalupa.img.com", "width": "50", "height": "100"},
@@ -295,7 +298,7 @@ var getElementsByTagNameTestPair = []documentTestPair[children]{
 	},
 	{
 		params: "address",
-		expect: children{
+		expect: []*Element{
 			{
 				TagName:     "address",
 				TextContent: "home 1",
@@ -316,7 +319,7 @@ var getElementsByTagNameTestPair = []documentTestPair[children]{
 }
 
 func Test_querySelector(t *testing.T) {
-	getValues := func(params string) (Element, error) {
+	getValues := func(params string) (*Element, error) {
 		return domSearchAPI{}.querySelector(params, document.root)
 	}
 
@@ -324,7 +327,7 @@ func Test_querySelector(t *testing.T) {
 }
 
 func Test_querySelectorAll(t *testing.T) {
-	getValues := func(params string) ([]Element, error) {
+	getValues := func(params string) ([]*Element, error) {
 		return domSearchAPI{}.querySelectorAll(params, document.root)
 	}
 
@@ -332,7 +335,7 @@ func Test_querySelectorAll(t *testing.T) {
 }
 
 func Test_getElementById(t *testing.T) {
-	getValues := func(params string) (Element, error) {
+	getValues := func(params string) (*Element, error) {
 		return domSearchAPI{}.getElementById(params, document.root)
 	}
 
@@ -340,7 +343,7 @@ func Test_getElementById(t *testing.T) {
 }
 
 func Test_getElementsByClassName(t *testing.T) {
-	getValues := func(params string) ([]Element, error) {
+	getValues := func(params string) ([]*Element, error) {
 		return domSearchAPI{}.getElementsByClassName(params, document.root)
 	}
 
@@ -348,21 +351,21 @@ func Test_getElementsByClassName(t *testing.T) {
 }
 
 func Test_getElementsByTagName(t *testing.T) {
-	getValues := func(params string) ([]Element, error) {
+	getValues := func(params string) ([]*Element, error) {
 		return domSearchAPI{}.getElementsByTagName(params, document.root)
 	}
 
 	testWithFewResults(t, getElementsByTagNameTestPair, getValues)
 }
 
-func testWithFewResults(t *testing.T, testPairs []documentTestPair[children], getValues func(string) ([]Element, error)) {
+func testWithFewResults(t *testing.T, testPairs []documentTestPair[elementList], getValues func(string) ([]*Element, error)) {
 	for _, pair := range testPairs {
 		v, err := getValues(pair.params)
-		var vMaped []Element
+		var vMaped []*Element
 
 		for _, el := range v {
-			mapedV, _ := tools.СopyStructWithoutFields[Element](el, elementIgnoredTestFields)
-			vMaped = append(vMaped, mapedV)
+			mapedV, _ := tools.СopyStructWithoutFields[Element](*el, elementIgnoredTestFields)
+			vMaped = append(vMaped, &mapedV)
 		}
 
 		if pair.expectErr {
@@ -377,10 +380,19 @@ func testWithFewResults(t *testing.T, testPairs []documentTestPair[children], ge
 	}
 }
 
-func testWithOneResult(t *testing.T, testPairs []documentTestPair[Element], getValues func(string) (Element, error)) {
+func testWithOneResult(t *testing.T, testPairs []documentTestPair[elementP], getValues func(string) (*Element, error)) {
 	for _, pair := range testPairs {
 		v, err := getValues(pair.params)
-		vMaped, _ := tools.СopyStructWithoutFields[Element](v, elementIgnoredTestFields)
+
+		if v != nil {
+			vMaped, err := tools.СopyStructWithoutFields[Element](*v, elementIgnoredTestFields)
+
+			if err != nil {
+				panic("Cann't map struct by СopyStructWithoutFields.")
+			}
+
+			v = &vMaped
+		}
 
 		if pair.expectErr {
 			if err != nil {
@@ -389,7 +401,7 @@ func testWithOneResult(t *testing.T, testPairs []documentTestPair[Element], getV
 
 			t.Error("\nfor", pair.params, "\nexpected error")
 		} else {
-			assert.EqualValuesf(t, pair.expect, vMaped, pair.description)
+			assert.EqualValuesf(t, pair.expect, v, pair.description)
 		}
 	}
 }

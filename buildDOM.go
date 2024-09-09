@@ -19,7 +19,7 @@ func isSelfClosingTag(tag string) bool {
 // Uses as downstream.
 func buildDOM(upStream chan html.Token) (*Document, error) {
 	var doc Document
-	var parentStack []Element
+	var parentStack []*Element
 	var currEl *Element
 
 rootLopp:
@@ -48,14 +48,14 @@ rootLopp:
 			}
 		case t.Type == html.EndTagToken:
 			if currEl != nil {
-				parentStack = append(parentStack, *currEl)
+				parentStack = append(parentStack, currEl)
 			}
 
 			if len(parentStack) == 0 {
 				panic("Error during parsing markup: unmatched closing tag. Please, report a bug.")
 			}
 
-			topFromParentStack := &parentStack[len(parentStack)-1]
+			topFromParentStack := parentStack[len(parentStack)-1]
 			parentStack = parentStack[:len(parentStack)-1]
 
 			if topFromParentStack.TagName != t.Data {
@@ -68,15 +68,15 @@ rootLopp:
 
 			// append Children
 			if len(parentStack) > 0 {
-				parent := &parentStack[len(parentStack)-1]
-				parent.Children = append(parent.Children, *topFromParentStack)
+				parent := parentStack[len(parentStack)-1]
+				parent.Children = append(parent.Children, topFromParentStack)
 			} else {
-				doc.root = *topFromParentStack
+				doc.root = topFromParentStack
 			}
 
 			currEl = nil
 		default: // html.SelfClosingTagToken, html.StartTagToken
-			newEl := Element{TagName: t.Data}
+			newEl := &Element{TagName: t.Data}
 
 			// ClassName ClassList Id Attributes fields
 			if len(t.Attr) > 0 {
@@ -99,12 +99,12 @@ rootLopp:
 
 			// PreviousElementSibling NextElementSibling fields
 			if len(parentStack) > 0 && currEl == nil {
-				parent := &parentStack[len(parentStack)-1]
+				parent := parentStack[len(parentStack)-1]
 
 				if len(parent.Children) > 0 {
-					lastChild := &parent.Children[len(parent.Children)-1]
+					lastChild := parent.Children[len(parent.Children)-1]
 					newEl.PreviousElementSibling = lastChild
-					lastChild.NextElementSibling = &newEl
+					lastChild.NextElementSibling = newEl
 				}
 			}
 
@@ -113,28 +113,28 @@ rootLopp:
 				if currEl != nil {
 					currEl.Children = append(currEl.Children, newEl)
 				} else {
-					topFromParentStack := &parentStack[len(parentStack)-1]
+					topFromParentStack := parentStack[len(parentStack)-1]
 					topFromParentStack.Children = append(topFromParentStack.Children, newEl)
 				}
 			case t.Type == html.StartTagToken:
 				if currEl != nil {
-					parentStack = append(parentStack, *currEl)
-					currEl.Children = append(currEl.Children, newEl)
+					parentStack = append(parentStack, currEl)
+					// currEl.Children = append(currEl.Children, newEl)
 					newEl.ParentElement = currEl
 				}
 
-				currEl = &newEl
+				currEl = newEl
 			}
 
 			switch tName := newEl.TagName; tName {
 			case "a":
-				doc.Links = append(doc.Links, &newEl)
+				doc.Links = append(doc.Links, newEl)
 			case "img":
-				doc.Images = append(doc.Images, &newEl)
+				doc.Images = append(doc.Images, newEl)
 			case "body":
-				doc.Body = &newEl
+				doc.Body = newEl
 			case "head":
-				doc.Head = &newEl
+				doc.Head = newEl
 			case "title":
 				doc.Title = &newEl.TextContent
 			}
