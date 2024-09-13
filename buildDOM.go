@@ -66,7 +66,6 @@ rootLopp:
 				topFromParentStack.TextContent = currEl.TextContent
 			}
 
-			// append Children
 			if len(parentStack) > 0 {
 				parent := parentStack[len(parentStack)-1]
 				parent.Children = append(parent.Children, topFromParentStack)
@@ -108,6 +107,14 @@ rootLopp:
 				}
 			}
 
+			// set ParentElement
+			switch {
+			case currEl != nil:
+				newEl.ParentElement = currEl
+			case len(parentStack) > 0:
+				newEl.ParentElement = parentStack[len(parentStack)-1]
+			}
+
 			switch {
 			case t.Type == html.SelfClosingTagToken, t.Type == html.StartTagToken && isSelfClosingTag(t.Data):
 				if currEl != nil {
@@ -119,8 +126,6 @@ rootLopp:
 			case t.Type == html.StartTagToken:
 				if currEl != nil {
 					parentStack = append(parentStack, currEl)
-					// currEl.Children = append(currEl.Children, newEl)
-					newEl.ParentElement = currEl
 				}
 
 				currEl = newEl

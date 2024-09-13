@@ -9,17 +9,18 @@ const (
 
 // DOM tree with DOM API.
 type Document struct {
-	Title   *string
-	Body    *Element
-	Head    *Element
-	Links   []*Element
-	Images  []*Element
-	Doctype docType
+	Title   *string    // https://developer.mozilla.org/en-US/docs/Web/API/Document/title
+	Body    *Element   // https://developer.mozilla.org/en-US/docs/Web/API/Document/body
+	Head    *Element   // https://developer.mozilla.org/en-US/docs/Web/API/Document/head
+	Links   []*Element // https://developer.mozilla.org/en-US/docs/Web/API/Document/links
+	Images  []*Element // https://developer.mozilla.org/en-US/docs/Web/API/Document/images
+	Doctype docType    // https://developer.mozilla.org/en-US/docs/Web/API/Document/doctype
 	root    *Element
 	domSearchAPI
 }
 
 // Find element by query selector. Exactly as document.querySelector() in browser DOM.
+// https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector
 //
 // Examples:
 //
@@ -31,6 +32,7 @@ func (d *Document) QuerySelector(queryStr string) (*Element, error) {
 }
 
 // Find elements by query selector. Exactly as document.querySelectorAll() in browser DOM.
+// https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll
 //
 // Examples:
 //
@@ -42,6 +44,7 @@ func (d *Document) QuerySelectorAll(queryStr string) ([]*Element, error) {
 }
 
 // Find element by id. Exactly as document.getElementById() in browser DOM.
+// https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById
 //
 // Examples:
 //
@@ -53,6 +56,7 @@ func (d *Document) GetElementById(id string) (*Element, error) {
 }
 
 // Find elements by CSS class name. Exactly as document.getElementsByClassName() in browser DOM.
+// https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementsByClassName
 //
 // Examples:
 //
@@ -64,6 +68,7 @@ func (d *Document) GetElementsByClassName(class string) ([]*Element, error) {
 }
 
 // Find elements by tag name. Exactly as document.getElementsByTagName() in browser DOM.
+// https://developer.mozilla.org/en-US/docs/Web/API/Element/getElementsByTagName
 //
 // Examples:
 //

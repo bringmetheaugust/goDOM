@@ -19,7 +19,7 @@ func main() {
 	defer r.Body.Close()
 
 	bytes, _ := io.ReadAll(r.Body)
-	document, _ := goDom.Create(bytes) // create document
+	document, _, _ := goDom.Create(bytes) // create document
 
 	// find DOM elements as posts (.s-post-summary) and get their link elements (.s-post-summary--content-title a)
 	posts, err := document.QuerySelectorAll(".s-post-summary .s-post-summary--content-title a")
