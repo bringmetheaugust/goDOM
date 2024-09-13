@@ -14,7 +14,9 @@ type query struct {
 	operator selectorOperator // if query is selector operator. "" if not
 	child    *query           // next level query (ex in ".lol .lal" .lal is a next level query)
 }
+
 type queries []query
+
 type selectorOperator string
 
 const (

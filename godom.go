@@ -11,6 +11,9 @@
 //
 // # DOM API
 // Created DOM has API to search elements by popular methods, like in browser DOM API.
+//
+// # jQuery
+// Create jQuery-like API with popular methods and fields to get inforamtion about selected element.
 
 package goDom
 
@@ -20,14 +23,19 @@ import (
 	"golang.org/x/net/html"
 )
 
-// Parsing markup, create and return DOM tree with DOM API.
+// Parsing markup, create and return DOM tree with DOM API or jQuery.
 // Return error if markup is invalid.
 //
 // Examples:
 //
-//	document, err := goDom.Create(bytes)
-//	if err != nil { // if markup is invalid
-func Create(data []byte) (*Document, error) {
+//	// getting DOM with DOM API
+//	document, _, err := goDom.Create(bytes)
+//	if err != nil {	// if markup is invalid
+//
+//	// getting jQuery
+//	_, jQ, err := goDom.Create(bytes)
+//	if err != nil {	// if markup is invalid
+func Create(data []byte) (*Document, JQuery, error) {
 	ch := make(chan html.Token)
 	t := html.NewTokenizer(strings.NewReader(string(data)))
 
@@ -47,8 +55,8 @@ func Create(data []byte) (*Document, error) {
 	d, err := buildDOM(ch)
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return d, nil
+	return d, createJQuery(d), nil
 }

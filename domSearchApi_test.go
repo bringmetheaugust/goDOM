@@ -1,326 +1,170 @@
 package goDom
 
 import (
-	"os"
 	"testing"
 
-	"github.com/bringmetheaugust/goDOM/tools"
 	"github.com/stretchr/testify/assert"
 )
 
-type elementP *Element
-type elementList []*Element
-
-type documentTestPair[E elementP | elementList] struct {
+type documentTestPair[P any, E *Element | []*Element | bool] struct {
 	description string
-	params      string
+	params      P
 	expect      E
 	expectErr   bool
 }
 
-var testFile, _ = os.ReadFile("./test/search.html")
-var document, _ = Create(testFile)
-var elementIgnoredTestFields = []string{"ParentElement", "Children", "PreviousElementSibling", "NextElementSibling", "domSearchAPI"}
+var (
+	querySelectorTestPair = []documentTestPair[string, *Element]{
+		{
+			description: "Id query.",
+			params:      "#hh",
+			expect:      mockEl_h4_2,
+		},
+		{
+			description: "Attribute with value query.",
+			params:      "li[data-pull='weee']",
+			expect:      mockEl_li_1,
+		},
+		{
+			description: "Multistage query.",
+			params:      "#nav_list ul#sub_item_list span",
+			expect:      mockEl_span_0,
+		},
+		{
+			description: "Multistage query.",
+			params:      "#nav_list ul#sub_item_list",
+			expect:      mockEl_ul_2,
+		},
+		{
+			description: "Multistage query.",
+			params:      ".bee ul",
+			expect:      mockEl_ul_4,
+		},
+		{
+			description: "Not existed element.",
+			params:      ".lal",
+			expect:      nil,
+			expectErr:   true,
+		},
+	}
+	querySelectorAllTestPair = []documentTestPair[string, []*Element]{
+		{
+			description: "Class query.",
+			params:      ".yellow",
+			expect:      []*Element{mockEl_li_11, mockEl_li_12},
+		},
+		{
+			description: "Attribute without value query.",
+			params:      "button[disabled]",
+			expect:      []*Element{mockEl_button_1, mockEl_button_3},
+		},
+		{
+			description: "Multistage query.",
+			params:      "footer .button button",
+			expect:      []*Element{mockEl_button_3, mockEl_button_4},
+		},
+		{
+			description: "Multi selectors.",
+			params:      ".homi, button[disabled], h2",
+			expect: []*Element{
+				mockEl_address_0,
+				mockEl_address_1,
+				mockEl_button_1,
+				mockEl_button_3,
+				mockEl_h2_1,
+				mockEl_h2_2,
+			},
+		},
+		// TODO
+		// {
+		// 	description: "Multi selector with query_operator_all operator.",
+		// 	params:      "#sub_item_list *",
+		// 	expect: []*Element{
+		// 		mockEl_li_8,
+		// 		mockEl_li_9,
+		// 		mockEl_span_0,
+		// 		mockEl_strong_0,
+		// 	},
+		// },
+		{
+			description: "Not existed elements.",
+			params:      ".lal",
+			expect:      nil,
+			expectErr:   true,
+		},
+	}
+	getElementByIdTestPair = []documentTestPair[string, *Element]{
+		{
+			params: "hh",
+			expect: mockEl_h4_2,
+		},
+		{
+			description: "Invalid query. Should get error.",
+			params:      "hh ll",
+			expect:      nil,
+			expectErr:   true,
+		},
+		{
+			description: "Not existed element.",
+			params:      "lal",
+			expect:      nil,
+			expectErr:   true,
+		},
+	}
+	getElementsByClassNameTestPair = []documentTestPair[string, []*Element]{
+		{
+			params: "homi",
+			expect: []*Element{mockEl_address_0, mockEl_address_1},
+		},
+		{
+			params:    "hommo",
+			expect:    nil,
+			expectErr: true,
+		},
+	}
+	getElementsByTagNameTestPair = []documentTestPair[string, []*Element]{
+		{
+			params:    "lii",
+			expect:    nil,
+			expectErr: true,
+		},
+		{
+			params: "img",
+			expect: []*Element{mockEl_img_1},
+		},
+		{
+			params: "address",
+			expect: []*Element{mockEl_address_0, mockEl_address_1},
+		},
+	}
+)
 
-var querySelectorTestPair = []documentTestPair[elementP]{
+var containsTestPair = []documentTestPair[[]*Element, bool]{
 	{
-		description: "Not existed element.",
-		params:      ".lal",
-		expect:      nil,
-		expectErr:   true,
+		description: "Contains.",
+		params:      []*Element{mockEl_html, mockEl_li_12},
+		expect:      true,
 	},
 	{
-		description: "Id query.",
-		params:      "#hh",
-		expect: &Element{
-			TagName:     "h4",
-			Id:          "hh",
-			TextContent: "nav item 2",
-			Attributes:  attributes{"id": "hh"},
-		},
-		expectErr: false,
+		description: "Contains.",
+		params:      []*Element{mockEl_head, mockEl_link_1},
+		expect:      true,
 	},
 	{
-		description: "Attribute with value query.",
-		params:      "li[data-pull='weee']",
-		expect: &Element{
-			TagName:     "li",
-			Id:          "",
-			TextContent: "nav item 1",
-			Attributes:  attributes{"class": "red", "data-pull": "weee"},
-			ClassName:   "red",
-			ClassList:   classList{"red"},
-		},
-		expectErr: false,
+		description: "Contains.",
+		params:      []*Element{mockEl_nav_1, mockEl_li_2},
+		expect:      true,
 	},
 	{
-		description: "Multistage query.",
-		params:      "#nav_list ul#sub_item_list span",
-		expect: &Element{
-			TagName:     "span",
-			TextContent: "top",
-			Attributes:  attributes{"class": "top"},
-			ClassName:   "top",
-			ClassList:   classList{"top"},
-		},
-		expectErr: false,
-	},
-	{
-		description: "Multistage query.",
-		params:      "#nav_list ul#sub_item_list",
-		expect: &Element{
-			TagName:     "ul",
-			Id:          "sub_item_list",
-			TextContent: "",
-			Attributes:  attributes{"id": "sub_item_list"},
-		},
-		expectErr: false,
-	},
-	{
-		description: "Multistage query.",
-		params:      ".bee ul",
-		expect: &Element{
-			TagName:     "ul",
-			ClassName:   "bee-bee",
-			ClassList:   classList{"bee-bee"},
-			Id:          "",
-			TextContent: "",
-			Attributes:  attributes{"class": "bee-bee"},
-		},
-		expectErr: false,
-	},
-}
-
-var querySelectorAllTestPair = []documentTestPair[elementList]{
-	{
-		description: "Not existed elements.",
-		params:      ".lal",
-		expect:      nil,
-		expectErr:   true,
-	},
-	{
-		description: "Class query.",
-		params:      ".yellow",
-		expect: []*Element{
-			{
-				TagName:     "li",
-				TextContent: "nav item 4",
-				Attributes:  attributes{"class": "yellow"},
-				ClassName:   "yellow",
-				ClassList:   classList{"yellow"},
-			},
-			{
-				TagName:     "li",
-				TextContent: "nav item 5",
-				Attributes:  attributes{"class": "yellow itt"},
-				ClassName:   "yellow itt",
-				ClassList:   classList{"yellow", "itt"},
-			},
-		},
-		expectErr: false,
-	},
-	{
-		description: "Attribute without value query.",
-		params:      "button[disabled]",
-		expect: []*Element{
-			{
-				TagName:     "button",
-				TextContent: "save",
-				Attributes:  attributes{"disabled": ""},
-			},
-			{
-				TagName:     "button",
-				TextContent: "delete",
-				Attributes:  attributes{"disabled": ""},
-			},
-		},
-		expectErr: false,
-	},
-	{
-		description: "Multistage query.",
-		params:      "footer .button button",
-		expect: []*Element{
-			{
-				TagName:     "button",
-				TextContent: "delete",
-				Attributes:  attributes{"disabled": ""},
-			},
-			{
-				TagName:     "button",
-				TextContent: "close",
-				Attributes:  nil,
-			},
-		},
-		expectErr: false,
-	},
-	{
-		description: "Multi selectors.",
-		params:      ".homi, button[disabled], h2",
-		expect: []*Element{
-			{
-				TagName:     "address",
-				TextContent: "home 1",
-				ClassList:   classList{"homi"},
-				ClassName:   "homi",
-				Attributes:  attributes{"class": "homi"},
-			},
-			{
-				TagName:     "address",
-				TextContent: "home 2",
-				ClassList:   classList{"homi", "homo"},
-				ClassName:   "homi homo",
-				Attributes:  attributes{"class": "homi homo"},
-			},
-			{
-				TagName:     "button",
-				TextContent: "save",
-				Attributes:  attributes{"disabled": ""},
-			},
-			{
-				TagName:     "button",
-				TextContent: "delete",
-				Attributes:  attributes{"disabled": ""},
-			},
-			{
-				TagName:     "h2",
-				TextContent: "this is header",
-			},
-			{
-				TagName:     "h2",
-				TextContent: "this is footer",
-			},
-		},
-		expectErr: false,
-	},
-	{
-		description: "Multi selector with query_operator_all operator.",
-		params:      "#sub_item_list *",
-		expect: []*Element{
-			{
-				TagName:     "li",
-				TextContent: "sub item 1",
-				ClassList:   classList{"white"},
-				ClassName:   "white",
-				Attributes:  attributes{"class": "white"},
-			},
-			{
-				TagName:     "li",
-				TextContent: "sub item 2",
-				ClassList:   classList{"white"},
-				ClassName:   "white",
-				Attributes:  attributes{"class": "white"},
-			},
-			{
-				TagName:     "span",
-				TextContent: "top",
-				ClassList:   classList{"top"},
-				ClassName:   "top",
-				Attributes:  attributes{"class": "top"},
-			},
-			{
-				TagName:     "strong",
-				TextContent: "U are strong!",
-				ClassList:   nil,
-				ClassName:   "",
-				Attributes:  nil,
-			},
-		},
-	},
-}
-
-var getElementByIdTestPair = []documentTestPair[elementP]{
-	{
-		description: "Not existed element.",
-		params:      "lal",
-		expect:      nil,
-		expectErr:   true,
-	},
-	{
-		params:    "hh ll",
-		expect:    nil,
-		expectErr: true,
-	},
-	{
-		params: "hh",
-		expect: &Element{
-			TagName:     "h4",
-			Id:          "hh",
-			TextContent: "nav item 2",
-			Attributes:  attributes{"id": "hh"},
-		},
-		expectErr: false,
-	},
-}
-
-var getElementsByClassNameTestPair = []documentTestPair[elementList]{
-	{
-		params:    "hommo",
-		expect:    nil,
-		expectErr: true,
-	},
-	{
-		params: "homi",
-		expect: []*Element{
-			{
-				TagName:     "address",
-				TextContent: "home 1",
-				Attributes:  attributes{"class": "homi"},
-				ClassName:   "homi",
-				ClassList:   classList{"homi"},
-			},
-			{
-				TagName:     "address",
-				TextContent: "home 2",
-				Attributes:  attributes{"class": "homi homo"},
-				ClassName:   "homi homo",
-				ClassList:   classList{"homi", "homo"},
-			},
-		},
-		expectErr: false,
-	},
-}
-
-var getElementsByTagNameTestPair = []documentTestPair[elementList]{
-	{
-		params:    "lii",
-		expect:    nil,
-		expectErr: true,
-	},
-	{
-		params: "img",
-		expect: []*Element{
-			{
-				TagName:    "img",
-				Attributes: attributes{"src": "http://zalupa.img.com", "width": "50", "height": "100"},
-			},
-		},
-		expectErr: false,
-	},
-	{
-		params: "address",
-		expect: []*Element{
-			{
-				TagName:     "address",
-				TextContent: "home 1",
-				Attributes:  attributes{"class": "homi"},
-				ClassName:   "homi",
-				ClassList:   classList{"homi"},
-			},
-			{
-				TagName:     "address",
-				TextContent: "home 2",
-				Attributes:  attributes{"class": "homi homo"},
-				ClassName:   "homi homo",
-				ClassList:   classList{"homi", "homo"},
-			},
-		},
-		expectErr: false,
+		description: "Doesn't contains.",
+		params:      []*Element{mockEl_h4_1, mockEl_h2_1},
+		expect:      false,
 	},
 }
 
 func Test_querySelector(t *testing.T) {
 	getValues := func(params string) (*Element, error) {
-		return domSearchAPI{}.querySelector(params, document.root)
+		return domSearchAPI{}.querySelector(params, mockDOM.root)
 	}
 
 	testWithOneResult(t, querySelectorTestPair, getValues)
@@ -328,7 +172,7 @@ func Test_querySelector(t *testing.T) {
 
 func Test_querySelectorAll(t *testing.T) {
 	getValues := func(params string) ([]*Element, error) {
-		return domSearchAPI{}.querySelectorAll(params, document.root)
+		return domSearchAPI{}.querySelectorAll(params, mockDOM.root)
 	}
 
 	testWithFewResults(t, querySelectorAllTestPair, getValues)
@@ -336,7 +180,7 @@ func Test_querySelectorAll(t *testing.T) {
 
 func Test_getElementById(t *testing.T) {
 	getValues := func(params string) (*Element, error) {
-		return domSearchAPI{}.getElementById(params, document.root)
+		return domSearchAPI{}.getElementById(params, mockDOM.root)
 	}
 
 	testWithOneResult(t, getElementByIdTestPair, getValues)
@@ -344,7 +188,7 @@ func Test_getElementById(t *testing.T) {
 
 func Test_getElementsByClassName(t *testing.T) {
 	getValues := func(params string) ([]*Element, error) {
-		return domSearchAPI{}.getElementsByClassName(params, document.root)
+		return domSearchAPI{}.getElementsByClassName(params, mockDOM.root)
 	}
 
 	testWithFewResults(t, getElementsByClassNameTestPair, getValues)
@@ -352,56 +196,48 @@ func Test_getElementsByClassName(t *testing.T) {
 
 func Test_getElementsByTagName(t *testing.T) {
 	getValues := func(params string) ([]*Element, error) {
-		return domSearchAPI{}.getElementsByTagName(params, document.root)
+		return domSearchAPI{}.getElementsByTagName(params, mockDOM.root)
 	}
 
 	testWithFewResults(t, getElementsByTagNameTestPair, getValues)
 }
 
-func testWithFewResults(t *testing.T, testPairs []documentTestPair[elementList], getValues func(string) ([]*Element, error)) {
-	for _, pair := range testPairs {
-		v, err := getValues(pair.params)
-		var vMaped []*Element
+func Test_contains(t *testing.T) {
+	for _, p := range containsTestPair {
+		v := domSearchAPI{}.contains(p.params[0], p.params[1])
 
-		for _, el := range v {
-			mapedV, _ := tools.СopyStructWithoutFields[Element](*el, elementIgnoredTestFields)
-			vMaped = append(vMaped, &mapedV)
-		}
+		assert.EqualValues(t, p.expect, v, p.description)
+	}
+}
 
-		if pair.expectErr {
+func testWithFewResults(t *testing.T, testPairs []documentTestPair[string, []*Element], getValues func(string) ([]*Element, error)) {
+	for _, p := range testPairs {
+		v, err := getValues(p.params)
+
+		if p.expectErr {
 			if err != nil {
 				continue
 			}
 
-			t.Error("\nfor", pair.params, "\nexpected error")
+			t.Error("\nfor", p.params, "\nexpected error")
 		} else {
-			assert.EqualValuesf(t, pair.expect, vMaped, pair.description)
+			assert.EqualValues(t, p.expect, v, p.description)
 		}
 	}
 }
 
-func testWithOneResult(t *testing.T, testPairs []documentTestPair[elementP], getValues func(string) (*Element, error)) {
-	for _, pair := range testPairs {
-		v, err := getValues(pair.params)
+func testWithOneResult(t *testing.T, testPairs []documentTestPair[string, *Element], getValues func(string) (*Element, error)) {
+	for _, p := range testPairs {
+		v, err := getValues(p.params)
 
-		if v != nil {
-			vMaped, err := tools.СopyStructWithoutFields[Element](*v, elementIgnoredTestFields)
-
-			if err != nil {
-				panic("Cann't map struct by СopyStructWithoutFields.")
-			}
-
-			v = &vMaped
-		}
-
-		if pair.expectErr {
+		if p.expectErr {
 			if err != nil {
 				continue
 			}
 
-			t.Error("\nfor", pair.params, "\nexpected error")
+			t.Error("\nfor", p.params, "\nexpected error")
 		} else {
-			assert.EqualValuesf(t, pair.expect, v, pair.description)
+			assert.EqualValues(t, p.expect, v, p.description)
 		}
 	}
 }

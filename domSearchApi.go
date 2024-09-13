@@ -19,7 +19,7 @@ func (api domSearchAPI) querySelector(queryStr string, el *Element) (*Element, e
 	findElementByQuery = func(q query, el *Element) (*Element, error) {
 		var match *Element
 		conditionFn := func(element *Element) bool {
-			return matchesQuery(q, element)
+			return elementMatchesQuery(q, element)
 		}
 		res, err := findOneByCondition(conditionFn, el)
 
@@ -67,7 +67,7 @@ func (api domSearchAPI) querySelectorAll(queryStr string, el *Element) ([]*Eleme
 
 		// find elements which match first query level
 		conditionFn := func(element *Element) bool {
-			return matchesQuery(q, element)
+			return elementMatchesQuery(q, element)
 		}
 		res, err := findAllByCondition(conditionFn, el)
 
@@ -136,8 +136,18 @@ func (api domSearchAPI) getElementsByTagName(tag string, el *Element) ([]*Elemen
 	return findAllByCondition(conditionFn, el)
 }
 
+func (api domSearchAPI) contains(root *Element, nested *Element) bool {
+	conditionFn := func(e *Element) bool {
+		return e == nested
+	}
+
+	_, err := findOneByCondition(conditionFn, root)
+
+	return err == nil
+}
+
 // Check if element matches one level query.
-func matchesQuery(q query, el *Element) bool {
+func elementMatchesQuery(q query, el *Element) bool {
 	if o := q.operator; o != "" {
 		switch o {
 		case query_operator_all:
