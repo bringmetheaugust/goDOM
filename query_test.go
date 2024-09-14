@@ -70,6 +70,20 @@ var (
 			},
 			false,
 		},
+		// TODO
+		// {
+		// 	"Tag with attribute query.",
+		// 	"img[src='http://zalupa.img.com']",
+		// 	query{
+		// 		tagName:    "img",
+		// 		id:         "",
+		// 		classList:  nil,
+		// 		attributes: attributes{"src": "http://zalupa.img.com"},
+		// 		operator:   "",
+		// 		child:      nil,
+		// 	},
+		// 	false,
+		// },
 		{
 			"Tag with attribute query.",
 			"div[lol='soccer']",

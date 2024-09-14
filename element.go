@@ -16,7 +16,7 @@ type Element struct {
 	ParentElement          *Element   // https://developer.mozilla.org/en-US/docs/Web/API/Node/parentElement
 	NextElementSibling     *Element   // https://developer.mozilla.org/en-US/docs/Web/API/Element/nextElementSibling
 	PreviousElementSibling *Element   // https://developer.mozilla.org/en-US/docs/Web/API/Element/previousElementSibling
-	domSearchAPI
+	domAPI
 }
 
 // Get HTML attribute.

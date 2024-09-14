@@ -44,7 +44,7 @@ func (j *JQ) Children(a ...string) JQ {
 			for _, e := range *j {
 				for _, q := range queries {
 					for _, c := range e.Children {
-						if elementMatchesQuery(q, c) {
+						if c.elementMatchesQuery(q, c) {
 							jq = append(jq, c)
 						}
 					}
@@ -94,7 +94,7 @@ func (j *JQ) Filter(i interface{}) JQ {
 		for _, e := range *j {
 			if queries, err := parseQueries(v); err == nil {
 				for _, q := range queries {
-					if elementMatchesQuery(q, e) {
+					if e.elementMatchesQuery(q, e) {
 						jq = append(jq, e)
 					}
 				}

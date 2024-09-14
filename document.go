@@ -16,7 +16,7 @@ type Document struct {
 	Images  []*Element // https://developer.mozilla.org/en-US/docs/Web/API/Document/images
 	Doctype docType    // https://developer.mozilla.org/en-US/docs/Web/API/Document/doctype
 	root    *Element
-	domSearchAPI
+	domAPI
 }
 
 // Find element by query selector. Exactly as document.querySelector() in browser DOM.

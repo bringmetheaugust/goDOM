@@ -293,7 +293,7 @@ var (
 		ClassName:   "",
 		ClassList:   nil,
 		Id:          "",
-		Children:    children{mockEl_h2_2, mockEl_nav_2},
+		Children:    children{mockEl_h2_2, mockEl_nav_2, mockEl_div_5},
 	}
 	mockEl_h2_2 = &Element{
 		TagName:     "h2",
@@ -430,6 +430,60 @@ var (
 		Id:          "",
 		Children:    nil,
 	}
+	mockEl_div_5 = &Element{
+		TagName:     "div",
+		TextContent: "",
+		Attributes:  nil,
+		ClassName:   "",
+		ClassList:   nil,
+		Id:          "nested",
+		Children:    children{mockEl_div_6},
+	}
+	mockEl_div_6 = &Element{
+		TagName:     "div",
+		TextContent: "",
+		Attributes:  nil,
+		ClassName:   "",
+		ClassList:   nil,
+		Id:          "",
+		Children:    children{mockEl_div_7, mockEl_div_8, mockEl_div_9},
+	}
+	mockEl_div_7 = &Element{
+		TagName:     "div",
+		TextContent: "",
+		Attributes:  attributes{"class": "nested nested-1"},
+		ClassName:   "nested nested-1",
+		ClassList:   classList{"nested", "nested-1"},
+		Id:          "",
+		Children:    nil,
+	}
+	mockEl_div_8 = &Element{
+		TagName:     "div",
+		TextContent: "",
+		Attributes:  attributes{"class": "nested nested-2"},
+		ClassName:   "nested nested-2",
+		ClassList:   classList{"nested", "nested-2"},
+		Id:          "",
+		Children:    nil,
+	}
+	mockEl_div_9 = &Element{
+		TagName:     "div",
+		TextContent: "",
+		Attributes:  attributes{"id": "chmo", "class": "nested nested-3", "data-pic": "pow"},
+		ClassName:   "nested nested-3",
+		ClassList:   classList{"nested", "nested-3"},
+		Id:          "chmo",
+		Children:    children{mockEl_div_10},
+	}
+	mockEl_div_10 = &Element{
+		TagName:     "div",
+		TextContent: "",
+		Attributes:  attributes{"class": "nested nested-4 nested-last"},
+		ClassName:   "nested nested-4 nested-last",
+		ClassList:   classList{"nested", "nested-4", "nested-last"},
+		Id:          "",
+		Children:    nil,
+	}
 )
 
 // Set element's ParentElement/PreviousElementSibling/NextElementSibling fields.
@@ -453,7 +507,7 @@ func buildMockElement(e *Element) *Element {
 }
 
 // var (
-// 	ignoredTestFields = []string{"domSearchAPI"}
+// 	ignoredTestFields = []string{"domAPI"}
 // 	testFilePaths     = []string{"./test/test.html"}
 // )
 

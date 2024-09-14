@@ -22,11 +22,11 @@ func buildDOM(upStream chan html.Token) (*Document, error) {
 	var parentStack []*Element
 	var currEl *Element
 
-rootLopp:
+rLoop:
 	for t := range upStream {
 		switch {
 		case t.Type == html.CommentToken:
-			continue rootLopp
+			continue rLoop
 		case t.Type == html.DoctypeToken:
 			switch tLow := strings.ToLower(t.Data); {
 			case strings.HasPrefix(tLow, "<!doctype html public '-//w3c//dtd xhtml"):
@@ -38,7 +38,7 @@ rootLopp:
 			str := strings.TrimSpace(t.Data)
 
 			if str == "" {
-				continue rootLopp
+				continue rLoop
 			}
 
 			if currEl != nil {
