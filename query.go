@@ -6,18 +6,18 @@ import (
 	"strings"
 )
 
-type query struct {
-	tagName string
-	id      string
-	classList
-	attributes
-	operator selectorOperator // if query is selector operator. "" if not
-	child    *query           // next level query (ex in ".lol .lal" .lal is a next level query)
-}
-
-type queries []query
-
-type selectorOperator string
+type (
+	query struct {
+		tagName string
+		id      string
+		classList
+		attributes
+		operator selectorOperator // if query is selector operator. "" if not
+		child    *query           // next level query (ex in ".lol .lal" .lal is a next level query)
+	}
+	queries          []query
+	selectorOperator string
+)
 
 const (
 	query_operator_all    selectorOperator = "*"

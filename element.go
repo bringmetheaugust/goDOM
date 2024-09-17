@@ -1,23 +1,24 @@
 package goDom
 
-type attributes map[string]string
-type classList []string
-type children []*Element
-
-// DOM element with fields and element's DOM API.
-type Element struct {
-	TagName                string     // https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName
-	TextContent            string     // https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent
-	Attributes             attributes // https://developer.mozilla.org/en-US/docs/Web/API/Element/attributes
-	Children               children   // https://developer.mozilla.org/en-US/docs/Web/API/Element/children
-	ClassName              string     // https://developer.mozilla.org/en-US/docs/Web/API/Element/className
-	ClassList              classList  // https://developer.mozilla.org/en-US/docs/Web/API/Element/classList
-	Id                     string     // https://developer.mozilla.org/en-US/docs/Web/API/Element/id
-	ParentElement          *Element   // https://developer.mozilla.org/en-US/docs/Web/API/Node/parentElement
-	NextElementSibling     *Element   // https://developer.mozilla.org/en-US/docs/Web/API/Element/nextElementSibling
-	PreviousElementSibling *Element   // https://developer.mozilla.org/en-US/docs/Web/API/Element/previousElementSibling
-	domAPI
-}
+type (
+	attributes map[string]string
+	classList  []string
+	children   []*Element
+	// DOM element with fields and element's DOM API.
+	Element struct {
+		TagName                string     // https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName
+		TextContent            string     // https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent
+		Attributes             attributes // https://developer.mozilla.org/en-US/docs/Web/API/Element/attributes
+		Children               children   // https://developer.mozilla.org/en-US/docs/Web/API/Element/children
+		ClassName              string     // https://developer.mozilla.org/en-US/docs/Web/API/Element/className
+		ClassList              classList  // https://developer.mozilla.org/en-US/docs/Web/API/Element/classList
+		Id                     string     // https://developer.mozilla.org/en-US/docs/Web/API/Element/id
+		ParentElement          *Element   // https://developer.mozilla.org/en-US/docs/Web/API/Node/parentElement
+		NextElementSibling     *Element   // https://developer.mozilla.org/en-US/docs/Web/API/Element/nextElementSibling
+		PreviousElementSibling *Element   // https://developer.mozilla.org/en-US/docs/Web/API/Element/previousElementSibling
+		domAPI
+	}
+)
 
 // Get HTML attribute.
 // https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute

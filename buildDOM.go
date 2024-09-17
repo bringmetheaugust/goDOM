@@ -24,43 +24,31 @@ func buildDOM(upStream chan html.Token) (*Document, error) {
 
 rLoop:
 	for t := range upStream {
-		switch {
-		case t.Type == html.CommentToken:
+		switch t.Type {
+		case html.CommentToken:
 			continue rLoop
-		case t.Type == html.DoctypeToken:
+		case html.DoctypeToken:
 			switch tLow := strings.ToLower(t.Data); {
 			case strings.HasPrefix(tLow, "<!doctype html public '-//w3c//dtd xhtml"):
 				doc.Doctype = xhtml
 			default:
 				doc.Doctype = html5
 			}
-		case t.Type == html.TextToken:
-			str := strings.TrimSpace(t.Data)
-
-			if str == "" {
-				continue rLoop
+		case html.TextToken:
+			if str := strings.TrimSpace(t.Data); str != "" {
+				if currEl != nil {
+					currEl.TextContent += str
+				} else {
+					parentStack[len(parentStack)-1].TextContent += str
+				}
 			}
-
-			if currEl != nil {
-				currEl.TextContent += str
-			} else {
-				parentStack[len(parentStack)-1].TextContent += str
-			}
-		case t.Type == html.EndTagToken:
+		case html.EndTagToken:
 			if currEl != nil {
 				parentStack = append(parentStack, currEl)
 			}
 
-			if len(parentStack) == 0 {
-				panic("Error during parsing markup: unmatched closing tag. Please, report a bug.")
-			}
-
 			topFromParentStack := parentStack[len(parentStack)-1]
 			parentStack = parentStack[:len(parentStack)-1]
-
-			if topFromParentStack.TagName != t.Data {
-				panic("Error during parsing markup: mismatched closing tag. Please, report a bug.")
-			}
 
 			if currEl != nil {
 				topFromParentStack.TextContent = currEl.TextContent
@@ -82,17 +70,15 @@ rLoop:
 				newEl.Attributes = make(attributes)
 
 				for _, a := range t.Attr {
-					v := a.Val
-
 					switch a.Key {
 					case "class":
-						newEl.ClassName += v
-						newEl.ClassList = strings.Split(v, " ")
+						newEl.ClassName += a.Val
+						newEl.ClassList = strings.Split(a.Val, " ")
 					case "id":
-						newEl.Id = v
+						newEl.Id = a.Val
 					}
 
-					newEl.Attributes[a.Key] = v
+					newEl.Attributes[a.Key] = a.Val
 				}
 			}
 

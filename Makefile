@@ -13,3 +13,7 @@ lint:
 	@echo "Run lints..."
 	@golangci-lint run
 	@gosec ./...
+
+benchs:
+	@echo "Run benchmark..."
+	@go clean -testcache && go test -run=XXX -bench=.

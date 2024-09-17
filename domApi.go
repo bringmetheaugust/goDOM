@@ -1,8 +1,6 @@
 package goDom
 
-import (
-	"slices"
-)
+import "slices"
 
 // DOM API search methods.
 type domAPI struct {
