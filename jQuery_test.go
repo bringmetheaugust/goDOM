@@ -8,7 +8,7 @@ import (
 
 type jQueryTestPair struct {
 	value  any
-	expect *JQ
+	expect JQ
 	descr  string
 }
 
@@ -19,7 +19,7 @@ var (
 		{
 			value:  ".bee",
 			expect: JQ{}.new(jQueryTestElements...),
-			descr:  "Create jQ with search query.",
+			descr:  "Create jQ with search selector.",
 		},
 		{
 			value:  jQueryTestElement,
@@ -28,12 +28,12 @@ var (
 		},
 		{
 			value:  ".nonexisted_query",
-			expect: &JQ{},
+			expect: JQ{},
 			descr:  "Empty JQ.",
 		},
 		{
 			value:  5,
-			expect: &JQ{},
+			expect: JQ{},
 			descr:  "Empty JQ.",
 		},
 	}

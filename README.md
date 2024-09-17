@@ -135,6 +135,13 @@ func main() {
  * [First](https://api.jquery.com/first)
  * [Has](https://api.jquery.com/has)
  * [HasClass](https://api.jquery.com/hasClass)
+ * [Last](https://api.jquery.com/last)
+ * [Next](https://api.jquery.com/next)
+ * [NextAll](https://api.jquery.com/nextAll)
+ * [Not](https://api.jquery.com/not)
+ * [Parent](https://api.jquery.com/parent)
+ * [Parents](https://api.jquery.com/parents)
+ * [Text] get current text element text content
 
 ## Something about jQuery API
 
